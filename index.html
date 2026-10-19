@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rehnuma Society | Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#0F766E',
+              600: '#0D9488',
+              700: '#115E59'
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col justify-center items-center p-4">
+
+  <main class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 transition-all">
+
+    <!-- 1. LOGIN INTERFACE -->
+    <section id="view-login" class="space-y-6">
+      <header class="text-center space-y-1">
+        <h1 class="text-3xl font-extrabold text-teal-700 dark:text-teal-400 tracking-tight">Rehnuma Society</h1>
+        <p class="text-xs uppercase tracking-widest text-slate-500 font-semibold">Under management MDBTW Association</p>
+      </header>
+
+      <div id="login-error-alert" class="hidden p-3 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-xs font-medium"></div>
+
+      <form id="form-login" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Email Address</label>
+          <input type="email" id="login-email" required placeholder="name@domain.com" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Password</label>
+          <input type="password" id="login-password" minlength="8" required placeholder="Minimum 8 characters" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 transition" />
+        </div>
+
+        <button type="submit" id="btn-login" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-sm shadow-md transition active:scale-[0.99]">
+          Sign In
+        </button>
+      </form>
+
+      <div class="relative flex items-center justify-center">
+        <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
+        <span class="bg-white dark:bg-slate-900 px-3 text-xs uppercase text-slate-400 font-semibold tracking-wider">or</span>
+        <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
+      </div>
+
+      <button id="btn-google-login" type="button" class="w-full py-2.5 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold flex items-center justify-center space-x-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+        <svg class="w-4 h-4" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Continue with Google</span>
+      </button>
+    </section>
+
+    <!-- 2. FIRST-TIME MEMBER REGISTRATION MODAL/VIEW (loginCount == 0) -->
+    <section id="view-registration" class="hidden space-y-5">
+      <header class="border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h2 class="text-xl font-bold text-teal-700 dark:text-teal-400">Complete Membership Profile</h2>
+        <p class="text-xs text-slate-500" id="step-counter">Step 1 of 3: Personal Information</p>
+      </header>
+
+      <form id="form-registration" class="space-y-4">
+        <!-- Step 1: Personal Info & Compressed Base64 Photo -->
+        <div id="reg-step-1" class="space-y-3">
+          <div class="flex items-center space-x-4">
+            <div class="relative w-16 h-16 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 overflow-hidden flex items-center justify-center bg-slate-50 dark:bg-slate-800 flex-shrink-0">
+              <img id="avatar-preview" class="hidden w-full h-full object-cover" />
+              <span id="avatar-placeholder" class="text-xs text-slate-400 text-center font-medium">Photo</span>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400">Profile Picture</label>
+              <input type="file" id="reg-avatar-input" accept="image/*" class="text-xs mt-1 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 dark:file:bg-teal-950 dark:file:text-teal-300 cursor-pointer" required />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1">Full Legal Name</label>
+            <input type="text" id="reg-name" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Date of Birth</label>
+              <input type="date" id="reg-dob" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Phone Number</label>
+              <input type="tel" id="reg-phone" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1">Residential Address</label>
+            <textarea id="reg-address" rows="2" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm"></textarea>
+          </div>
+        </div>
+
+        <!-- Step 2: Identification & Income Details -->
+        <div id="reg-step-2" class="hidden space-y-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1">Aadhaar Card Number</label>
+            <input type="text" id="reg-aadhar" maxlength="12" pattern="\d{12}" placeholder="12-digit UIDAI number" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm tracking-widest" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1">PAN Card Number</label>
+            <input type="text" id="reg-pan" maxlength="10" placeholder="10-character alphanumeric PAN" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm uppercase tracking-widest" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1">Estimated Monthly Income (₹)</label>
+            <input type="number" id="reg-income" min="0" required placeholder="e.g. 25000" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm" />
+          </div>
+        </div>
+
+        <!-- Step 3: Undertaking & Rules Confirmation -->
+        <div id="reg-step-3" class="hidden space-y-4">
+          <div class="p-3.5 rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs space-y-2 leading-relaxed">
+            <p class="font-bold text-teal-700 dark:text-teal-400">Society Constitution Agreement:</p>
+            <ol class="list-decimal pl-4 space-y-1 text-slate-600 dark:text-slate-300">
+              <li>Monthly installment of strictly <strong class="text-slate-900 dark:text-white">₹1,000</strong> must be deposited.</li>
+              <li>All micro-loans granted are strictly non-commercial and <strong class="text-slate-900 dark:text-white">without interest</strong>.</li>
+              <li>I hereby certify that all provided details and identity documents are authentic.</li>
+            </ol>
+          </div>
+
+          <label class="flex items-center space-x-2 text-xs cursor-pointer">
+            <input type="checkbox" id="reg-terms-check" required class="rounded border-slate-300 text-teal-600 focus:ring-teal-500" />
+            <span>I have read, understood, and accept all the terms.</span>
+          </label>
+        </div>
+
+        <div class="flex justify-between items-center pt-3 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" id="btn-reg-prev" class="hidden px-4 py-2 text-xs font-bold border border-slate-300 dark:border-slate-700 rounded-lg">Back</button>
+          <button type="button" id="btn-reg-next" class="ml-auto px-5 py-2 text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition">Next Step</button>
+          <button type="submit" id="btn-reg-submit" class="hidden ml-auto px-5 py-2 text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition">Confirm & Submit</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 3. APPLICATION STATUS NOTIFICATIONS -->
+    <section id="view-status-submitted" class="hidden text-center space-y-4 py-4">
+      <div class="w-14 h-14 mx-auto rounded-full bg-teal-50 dark:bg-teal-950/80 text-teal-600 flex items-center justify-center">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="space-y-1">
+        <h2 class="text-lg font-bold">Application Submitted Successfully</h2>
+        <p class="text-xs text-slate-500 leading-relaxed">Your membership registration is currently under review by the administration. You will be granted full access once verified and approved.</p>
+      </div>
+      <button onclick="portalLogout()" class="px-4 py-2 border border-slate-300 dark:border-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">Sign Out</button>
+    </section>
+
+    <section id="view-status-rejected" class="hidden text-center space-y-4 py-4">
+      <div class="w-14 h-14 mx-auto rounded-full bg-rose-50 dark:bg-rose-950/80 text-rose-600 flex items-center justify-center">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="space-y-1">
+        <h2 class="text-lg font-bold text-rose-600">Registration Rejected</h2>
+        <p class="text-xs text-slate-500 leading-relaxed">Your membership application was declined. Please reach out to the society administration office for further inquiry.</p>
+      </div>
+      <button onclick="portalLogout()" class="px-4 py-2 border border-slate-300 dark:border-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">Sign Out</button>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      GoogleAuthProvider, 
+      signInWithPopup, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { 
+      getDatabase, 
+      ref, 
+      set, 
+      onDisconnect, 
+      serverTimestamp as rtdbTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAhqwwXZ6k8Zm4lCVd8UFLcYaqqIg-5j6Q",
+      authDomain: "rehnuma-society-46.firebaseapp.com",
+      projectId: "rehnuma-society-46",
+      storageBucket: "rehnuma-society-46.firebasestorage.app",
+      messagingSenderId: "28094307245",
+      appId: "1:28094307245:web:32f876396b5fc7293f1f24",
+      databaseURL: "https://rehnuma-society-46-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
+
+    let activeStep = 1;
+    let compressedAvatarBase64 = "";
+
+    // Helper: Generate unique session token
+    function generateSessionToken() {
+      return 'sess_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+    }
+
+    // Helper: Browser & Platform detection for Audit Log
+    function getDeviceSignature() {
+      const ua = navigator.userAgent;
+      let browser = "Unknown Browser";
+      if (ua.includes("Firefox")) browser = "Firefox";
+      else if (ua.includes("Chrome")) browser = "Chrome";
+      else if (ua.includes("Safari")) browser = "Safari";
+      else if (ua.includes("Edge")) browser = "Edge";
+      return `${browser} on ${navigator.platform || 'Device'}`;
+    }
+
+    // Setup Single Active Session & Dual-DB Presence
+    async function bindUserSession(user) {
+      const sessionToken = generateSessionToken();
+      const deviceSignature = getDeviceSignature();
+
+      // 1. RTDB: Active session state + Auto-Offline Hook
+      const presenceRef = ref(rtdb, `presence/${user.uid}`);
+      await set(presenceRef, {
+        sessionToken: sessionToken,
+        state: "online",
+        device: deviceSignature,
+        lastActive: rtdbTimestamp()
+      });
+      onDisconnect(presenceRef).update({
+        state: "offline",
+        lastActive: rtdbTimestamp()
+      });
+
+      // 2. Firestore: Permanent Audit Trail
+      await setDoc(doc(db, "audit_logs", `${user.uid}_${Date.now()}`), {
+        uid: user.uid,
+        email: user.email,
+        device: deviceSignature,
+        timestamp: serverTimestamp(),
+        eventType: "LOGIN"
+      });
+
+      sessionStorage.setItem("activeSessionToken", sessionToken);
+    }
+
+    // View Manager
+    function setView(viewId) {
+      ["view-login", "view-registration", "view-status-submitted", "view-status-rejected"].forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+      document.getElementById(viewId).classList.remove("hidden");
+    }
+
+    function showLoginError(msg) {
+      const errBox = document.getElementById("login-error-alert");
+      errBox.textContent = msg;
+      errBox.classList.remove("hidden");
+    }
+
+    // Authorization & Routing Gatekeeper
+    async function evaluateRouting(user) {
+      if (!user) {
+        setView("view-login");
+        return;
+      }
+
+      // Check 1: Is user an Administrator?
+      const adminDoc = await getDoc(doc(db, "admins", user.uid));
+      if (adminDoc.exists()) {
+        await bindUserSession(user);
+        window.location.href = "/User/admin.html";
+        return;
+      }
+
+      // Check 2: Member profile existence & authorization
+      const memberDoc = await getDoc(doc(db, "users", user.uid));
+
+      if (!memberDoc.exists()) {
+        await signOut(auth);
+        showLoginError("Access Denied: This account is not registered. Please contact the administrator.");
+        setView("view-login");
+        return;
+      }
+
+      const member = memberDoc.data();
+      await bindUserSession(user);
+
+      // Check 3: Check First-time Login status
+      if (member.loginCount === 0) {
+        // Pre-fill registered info
+        document.getElementById("reg-name").value = member.name || "";
+        document.getElementById("reg-phone").value = member.phone || "";
+        setView("view-registration");
+        return;
+      }
+
+      // Check 4: Permanent membership status routing
+      if (member.membershipStatus === "pending_approval") {
+        setView("view-status-submitted");
+      } else if (member.membershipStatus === "rejected") {
+        setView("view-status-rejected");
+      } else if (member.membershipStatus === "active") {
+        window.location.href = "/User/member.html";
+      } else {
+        setView("view-status-submitted");
+      }
+    }
+
+    // Auth Listeners
+    onAuthStateChanged(auth, evaluateRouting);
+
+    // Form: Email/Password Login
+    document.getElementById("form-login").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      document.getElementById("login-error-alert").classList.add("hidden");
+      const email = document.getElementById("login-email").value.trim();
+      const pass = document.getElementById("login-password").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        showLoginError(err.message || "Failed to authenticate. Please check your credentials.");
+      }
+    });
+
+    // Button: Google Sign-in
+    document.getElementById("btn-google-login").addEventListener("click", async () => {
+      document.getElementById("login-error-alert").classList.add("hidden");
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        showLoginError(err.message || "Google Sign-in failed.");
+      }
+    });
+
+    // Global Logout helper
+    window.portalLogout = async () => {
+      if (auth.currentUser) {
+        const presenceRef = ref(rtdb, `presence/${auth.currentUser.uid}`);
+        await set(presenceRef, { state: "offline", sessionToken: null, lastActive: rtdbTimestamp() });
+      }
+      await signOut(auth);
+      setView("view-login");
+    };
+
+    // --- Profile Picture Canvas Compression (200x200) ---
+    document.getElementById("reg-avatar-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 200;
+          canvas.height = 200;
+          const ctx = canvas.getContext("2d");
+
+          // Square center crop & scale
+          const minDim = Math.min(img.width, img.height);
+          const startX = (img.width - minDim) / 2;
+          const startY = (img.height - minDim) / 2;
+          ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, 200, 200);
+
+          compressedAvatarBase64 = canvas.toDataURL("image/jpeg", 0.75); // ~20KB
+          const preview = document.getElementById("avatar-preview");
+          preview.src = compressedAvatarBase64;
+          preview.classList.remove("hidden");
+          document.getElementById("avatar-placeholder").classList.add("hidden");
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // --- Multi-Step Form Controls ---
+    const updateWizard = () => {
+      document.getElementById("reg-step-1").classList.toggle("hidden", activeStep !== 1);
+      document.getElementById("reg-step-2").classList.toggle("hidden", activeStep !== 2);
+      document.getElementById("reg-step-3").classList.toggle("hidden", activeStep !== 3);
+
+      document.getElementById("btn-reg-prev").classList.toggle("hidden", activeStep === 1);
+      document.getElementById("btn-reg-next").classList.toggle("hidden", activeStep === 3);
+      document.getElementById("btn-reg-submit").classList.toggle("hidden", activeStep !== 3);
+
+      const titles = [
+        "Step 1 of 3: Personal Information",
+        "Step 2 of 3: Identification & Income",
+        "Step 3 of 3: Terms & Agreement"
+      ];
+      document.getElementById("step-counter").textContent = titles[activeStep - 1];
+    };
+
+    document.getElementById("btn-reg-next").addEventListener("click", () => {
+      if (activeStep === 1 && !compressedAvatarBase64) {
+        alert("Please select and upload a profile picture.");
+        return;
+      }
+      if (activeStep < 3) {
+        activeStep++;
+        updateWizard();
+      }
+    });
+
+    document.getElementById("btn-reg-prev").addEventListener("click", () => {
+      if (activeStep > 1) {
+        activeStep--;
+        updateWizard();
+      }
+    });
+
+    // Submit Complete Onboarding Registration
+    document.getElementById("form-registration").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        await updateDoc(doc(db, "users", user.uid), {
+          name: document.getElementById("reg-name").value.trim(),
+          dob: document.getElementById("reg-dob").value,
+          phone: document.getElementById("reg-phone").value.trim(),
+          address: document.getElementById("reg-address").value.trim(),
+          aadharNumber: document.getElementById("reg-aadhar").value.trim(),
+          panNumber: document.getElementById("reg-pan").value.trim().toUpperCase(),
+          monthlyIncome: Number(document.getElementById("reg-income").value),
+          avatarBase64: compressedAvatarBase64,
+          loginCount: 1,
+          membershipStatus: "pending_approval",
+          submittedAt: serverTimestamp()
+        });
+
+        setView("view-status-submitted");
+      } catch (err) {
+        alert("Error saving details: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
