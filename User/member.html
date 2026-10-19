@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rehnuma Society | Member Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#0F766E', 600: '#0D9488', 700: '#115E59' }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col pb-20">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div id="member-avatar-container" class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+        <span id="member-avatar-fallback" class="font-bold text-teal-600 text-sm">M</span>
+        <img id="member-avatar-img" class="hidden w-full h-full object-cover" />
+      </div>
+      <div>
+        <h1 id="member-name-header" class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">Loading...</h1>
+        <div class="flex items-center space-x-2 mt-0.5">
+          <span id="member-id-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300">MID: ---</span>
+          <span id="member-online-status" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        </div>
+      </div>
+    </div>
+    <button onclick="memberLogout()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
+      Sign Out
+    </button>
+  </header>
+
+  <!-- MAIN ACTION: MONTHLY INSTALLMENT BUTTON -->
+  <div class="max-w-md w-full mx-auto p-4 pt-6">
+    <button id="btn-pay-installment" class="w-full py-4 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-teal-700/20 active:scale-[0.98] transition-all flex flex-col items-center justify-center space-y-1">
+      <span class="tracking-wide">Monthly installment pay ₹1000</span>
+      <span class="text-[10px] font-normal opacity-80">MDBTW Association Mutual Welfare Fund</span>
+    </button>
+    <div id="deposit-alert" class="hidden mt-3 p-3 rounded-xl text-xs font-semibold"></div>
+  </div>
+
+  <!-- TAB CONTENTS CONTAINER -->
+  <main class="flex-1 max-w-md w-full mx-auto px-4 pb-6 space-y-4">
+
+    <!-- 1. TAB: HOME -->
+    <section id="tab-content-home" class="space-y-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">Society Overview</h2>
+          <span class="text-[10px] text-slate-400 font-semibold">MDBTW Association</span>
+        </div>
+        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+          Welcome to Rehnuma Society. Our welfare platform operates strictly without interest, providing mutual financial assistance and zero-cost micro-loans for all verified members.
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-2 shadow-sm">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Your Account Summary</h3>
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+            <span class="text-[10px] text-slate-400 font-semibold block">Total Deposited</span>
+            <span id="home-total-deposited" class="text-sm font-bold text-teal-600 font-mono">₹0</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+            <span class="text-[10px] text-slate-400 font-semibold block">Active Loan</span>
+            <span id="home-loan-status" class="text-sm font-bold text-slate-600 dark:text-slate-300">None</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TAB: DEPOSIT -->
+    <section id="tab-content-deposit" class="hidden space-y-3">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Installment Ledger</h2>
+        <span class="text-[11px] font-mono text-teal-600 font-bold" id="deposit-summary-total">Total: ₹0</span>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-100 dark:bg-slate-800/60 text-slate-500 uppercase text-[10px] font-bold">
+            <tr>
+              <th class="p-3">Month</th>
+              <th class="p-3 text-right">Installment</th>
+              <th class="p-3 text-right">Deposit</th>
+            </tr>
+          </thead>
+          <tbody id="deposit-table-rows" class="divide-y divide-slate-100 dark:divide-slate-800 font-mono">
+            <tr>
+              <td colspan="3" class="p-4 text-center text-slate-400 font-sans text-xs">No deposit records found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. TAB: LOAN FORM -->
+    <section id="tab-content-loan" class="hidden space-y-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-2">
+          <h2 class="text-sm font-bold text-teal-700 dark:text-teal-400">Apply for Interest-Free Loan</h2>
+          <p class="text-[11px] text-slate-400">Strictly 0% interest non-commercial welfare loan</p>
+        </div>
+
+        <div id="loan-alert" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+        <form id="form-loan-apply" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Required Amount (₹)</label>
+            <input type="number" id="loan-amount" min="1000" step="500" required placeholder="e.g. 20000" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Repayment Tenure (Months)</label>
+            <input type="number" id="loan-tenure" min="1" max="36" required placeholder="e.g. 13" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Purpose of Loan</label>
+            <textarea id="loan-purpose" rows="2" required placeholder="Specify family/medical/emergency purpose" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none"></textarea>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-[11px] space-y-1 text-slate-500">
+            <p>• Estimated Monthly EMI: <strong id="calculated-emi" class="text-teal-600 font-mono">₹0</strong></p>
+            <p>• Interest Fee: <strong class="text-emerald-600 font-mono">₹0 (Zero Interest)</strong></p>
+          </div>
+
+          <button type="submit" id="btn-submit-loan" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition">
+            Submit Loan Application
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 4. TAB: RECOVERY -->
+    <section id="tab-content-recovery" class="hidden space-y-3">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Loan Recovery & EMI Ledger</h2>
+      <div id="recovery-container" class="space-y-3">
+        <p class="text-xs text-slate-400 text-center py-8">Checking recovery details...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM FIXED NAVIGATION BAR (4 TABS) -->
+  <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-800 flex justify-around items-center py-2 z-40">
+    <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center text-teal-600 dark:text-teal-400 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      <span class="text-[10px] font-bold mt-0.5">Home</span>
+    </button>
+
+    <button onclick="switchTab('deposit')" id="nav-btn-deposit" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+      </svg>
+      <span class="text-[10px] font-bold mt-0.5">Deposit</span>
+    </button>
+
+    <button onclick="switchTab('loan')" id="nav-btn-loan" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <span class="text-[10px] font-bold mt-0.5">Loan Form</span>
+    </button>
+
+    <button onclick="switchTab('recovery')" id="nav-btn-recovery" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+      </svg>
+      <span class="text-[10px] font-bold mt-0.5">Recovery</span>
+    </button>
+  </nav>
+
+  <script type="module">
+    import { auth, db, rtdb } from "../firebase-config.js";
+    import { 
+      doc, 
+      getDoc, 
+      collection, 
+      getDocs, 
+      addDoc, 
+      query, 
+      orderBy, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { ref, set, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+    let currentMember = null;
+    let currentUid = null;
+
+    // 1. Auth Guard & Identity Binding
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = "/";
+        return;
+      }
+
+      currentUid = user.uid;
+      const docSnap = await getDoc(doc(db, "users", currentUid));
+
+      if (!docSnap.exists() || docSnap.data().membershipStatus !== "active") {
+        alert("Access Denied: Account is not in active standing.");
+        window.location.href = "/";
+        return;
+      }
+
+      currentMember = docSnap.data();
+
+      // Set Header Profile Details
+      document.getElementById("member-name-header").textContent = currentMember.name || "Member";
+      document.getElementById("member-id-badge").textContent = `MID: ${currentMember.username || 'M-PENDING'}`;
+
+      if (currentMember.avatarBase64) {
+        const img = document.getElementById("member-avatar-img");
+        img.src = currentMember.avatarBase64;
+        img.classList.remove("hidden");
+        document.getElementById("member-avatar-fallback").classList.add("hidden");
+      }
+
+      loadDepositsLedger();
+      loadRecoveryLedger();
+    });
+
+    // 2. Tab Navigation Logic
+    window.switchTab = (tabName) => {
+      const tabs = ["home", "deposit", "loan", "recovery"];
+      tabs.forEach(t => {
+        const section = document.getElementById(`tab-content-${t}`);
+        const navBtn = document.getElementById(`nav-btn-${t}`);
+        const isActive = t === tabName;
+
+        section.classList.toggle("hidden", !isActive);
+        navBtn.className = isActive 
+          ? "flex flex-col items-center text-teal-600 dark:text-teal-400 transition-colors"
+          : "flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors";
+      });
+    };
+
+    // 3. Deposit Action Button (Monthly installment ₹1000)
+    document.getElementById("btn-pay-installment").addEventListener("click", async () => {
+      if (!confirm("Confirm monthly installment payment submission of ₹1,000?")) return;
+
+      const btn = document.getElementById("btn-pay-installment");
+      const alertBox = document.getElementById("deposit-alert");
+      btn.disabled = true;
+
+      try {
+        const now = new Date();
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const currentMonthString = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
+        // Fetch previous cumulative total
+        const depositsQuery = query(collection(db, "users", currentUid, "deposits"), orderBy("createdAt", "desc"));
+        const existingDocs = await getDocs(depositsQuery);
+        let previousTotal = 0;
+        if (!existingDocs.empty) {
+          previousTotal = existingDocs.docs[0].data().cumulativeTotal || 0;
+        }
+
+        const newCumulative = previousTotal + 1000;
+
+        await addDoc(collection(db, "users", currentUid, "deposits"), {
+          month: currentMonthString,
+          installment: 1000,
+          cumulativeTotal: newCumulative,
+          createdAt: serverTimestamp()
+        });
+
+        alertBox.className = "mt-3 p-3 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
+        alertBox.textContent = `₹1,000 Installment recorded for ${currentMonthString}. Total Deposit: ₹${newCumulative}`;
+        alertBox.classList.remove("hidden");
+
+        loadDepositsLedger();
+      } catch (err) {
+        alertBox.className = "mt-3 p-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300";
+        alertBox.textContent = "Transaction failed: " + err.message;
+        alertBox.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // 4. Load Deposits Ledger (Table: Month, Installment, Deposit)
+    async function loadDepositsLedger() {
+      const tbody = document.getElementById("deposit-table-rows");
+      try {
+        const q = query(collection(db, "users", currentUid, "deposits"), orderBy("createdAt", "asc"));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400 font-sans text-xs">No deposit records recorded yet.</td></tr>`;
+          document.getElementById("home-total-deposited").textContent = "₹0";
+          document.getElementById("deposit-summary-total").textContent = "Total: ₹0";
+          return;
+        }
+
+        tbody.innerHTML = "";
+        let finalCumulative = 0;
+
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          finalCumulative = d.cumulativeTotal;
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-50/50 dark:hover:bg-slate-800/30";
+          tr.innerHTML = `
+            <td class="p-3 font-medium text-slate-700 dark:text-slate-200">${d.month}</td>
+            <td class="p-3 text-right text-slate-500">₹${d.installment}</td>
+            <td class="p-3 text-right font-bold text-teal-600">₹${d.cumulativeTotal}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById("home-total-deposited").textContent = `₹${finalCumulative}`;
+        document.getElementById("deposit-summary-total").textContent = `Total: ₹${finalCumulative}`;
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-rose-500 font-sans text-xs">Failed to load ledger: ${err.message}</td></tr>`;
+      }
+    }
+
+    // 5. Loan Application & Live EMI Calculation
+    const loanAmtInput = document.getElementById("loan-amount");
+    const tenureInput = document.getElementById("loan-tenure");
+
+    function updateLiveEmi() {
+      const principal = Number(loanAmtInput.value) || 0;
+      const tenure = Number(tenureInput.value) || 1;
+      const emi = Math.ceil(principal / tenure);
+      document.getElementById("calculated-emi").textContent = `₹${emi}/month`;
+    }
+
+    loanAmtInput.addEventListener("input", updateLiveEmi);
+    tenureInput.addEventListener("input", updateLiveEmi);
+
+    document.getElementById("form-loan-apply").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const alertBox = document.getElementById("loan-alert");
+      const btn = document.getElementById("btn-submit-loan");
+
+      const principal = Number(loanAmtInput.value);
+      const tenure = Number(tenureInput.value);
+      const purpose = document.getElementById("loan-purpose").value.trim();
+      const emi = Math.ceil(principal / tenure);
+
+      btn.disabled = true;
+
+      try {
+        await addDoc(collection(db, "loans"), {
+          uid: currentUid,
+          memberName: currentMember.name,
+          username: currentMember.username,
+          principalAmount: principal,
+          tenureMonths: tenure,
+          monthlyEmi: emi,
+          purpose: purpose,
+          status: "pending_review",
+          remainingBalance: principal,
+          paidEmis: 0,
+          createdAt: serverTimestamp()
+        });
+
+        alertBox.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
+        alertBox.textContent = "Loan application submitted for administrator sanction.";
+        alertBox.classList.remove("hidden");
+        document.getElementById("form-loan-apply").reset();
+        document.getElementById("calculated-emi").textContent = "₹0";
+      } catch (err) {
+        alertBox.className = "p-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300";
+        alertBox.textContent = "Error submitting application: " + err.message;
+        alertBox.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // 6. Load Recovery Ledger
+    async function loadRecoveryLedger() {
+      const container = document.getElementById("recovery-container");
+      try {
+        const q = query(collection(db, "loans"));
+        const snap = await getDocs(q);
+
+        const memberLoans = [];
+        snap.forEach(d => {
+          if (d.data().uid === currentUid && d.data().status === "sanctioned") {
+            memberLoans.push(d.data());
+          }
+        });
+
+        if (memberLoans.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No active loans under recovery.</p>`;
+          document.getElementById("home-loan-status").textContent = "None";
+          return;
+        }
+
+        container.innerHTML = "";
+        memberLoans.forEach(l => {
+          document.getElementById("home-loan-status").textContent = `₹${l.remainingBalance} Bal`;
+
+          const card = document.createElement("div");
+          card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm";
+          card.innerHTML = `
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Interest-Free Micro Loan</span>
+              <span class="text-xs font-mono font-bold text-teal-600">₹${l.principalAmount}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                <span class="text-[10px] text-slate-400 block">Monthly EMI</span>
+                <span class="font-bold font-mono">₹${l.monthlyEmi}</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                <span class="text-[10px] text-slate-400 block">Tenure</span>
+                <span class="font-bold font-mono">${l.tenureMonths} Months</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-1 text-xs">
+              <span class="text-slate-400">Remaining Balance:</span>
+              <span class="font-mono font-bold text-rose-600">₹${l.remainingBalance}</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Failed to fetch recovery data: ${err.message}</p>`;
+      }
+    }
+
+    // 7. Member Logout Handler
+    window.memberLogout = async () => {
+      if (currentUid) {
+        const presenceRef = ref(rtdb, `presence/${currentUid}`);
+        await set(presenceRef, { state: "offline", sessionToken: null, lastActive: rtdbTimestamp() });
+      }
+      await auth.signOut();
+      window.location.href = "/";
+    };
+  </script>
+</body>
+</html>
