@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rehnuma Society | Admin Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#0F766E', 600: '#0D9488', 700: '#115E59' }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <button id="btn-open-drawer" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none">
+        <svg class="w-6 h-6 text-slate-700 dark:text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <div>
+        <h1 class="text-base font-bold text-teal-700 dark:text-teal-400">Rehnuma Admin</h1>
+        <p class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold">Management Console</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <span id="admin-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300">ADMIN</span>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="flex border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+    <button onclick="switchMainTab('loans')" id="tab-btn-loans" class="flex-1 py-3 text-center text-xs font-bold border-b-2 border-teal-600 text-teal-600">Current Loans</button>
+    <button onclick="switchMainTab('members')" id="tab-btn-members" class="flex-1 py-3 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700">Members Directory</button>
+  </nav>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-4">
+
+    <!-- 1. TAB: CURRENT LOANS -->
+    <section id="section-loans" class="space-y-3">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Active Society Loans</h2>
+        <span id="loan-count" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800">0 Active</span>
+      </div>
+      <div id="loans-container" class="space-y-3">
+        <p class="text-xs text-slate-400 text-center py-8">No active loans found.</p>
+      </div>
+    </section>
+
+    <!-- 2. TAB: MEMBERS DIRECTORY -->
+    <section id="section-members" class="hidden space-y-3">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Registered Members</h2>
+        <span id="member-count" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800">0 Members</span>
+      </div>
+      <div id="members-container" class="space-y-3">
+        <p class="text-xs text-slate-400 text-center py-8">Loading directory...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LEFT DRAWER OVERLAY -->
+  <div id="drawer-overlay" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 transition-opacity"></div>
+
+  <!-- LEFT DRAWER MENU -->
+  <aside id="drawer-menu" class="fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-teal-700 dark:text-teal-400 text-base">Rehnuma Society</h3>
+        <p class="text-[11px] text-slate-400">Administration Portal</p>
+      </div>
+      <button id="btn-close-drawer" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-4 space-y-2 flex-1 overflow-y-auto">
+      <button onclick="openAuthorizeModal()" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-semibold text-xs transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+        </svg>
+        <span>Authorize Member</span>
+      </button>
+
+      <button onclick="switchMainTab('loans'); closeDrawer();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition">
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Current Loans</span>
+      </button>
+
+      <button onclick="switchMainTab('members'); closeDrawer();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition">
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span>Members Directory</span>
+      </button>
+    </div>
+
+    <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+      <button onclick="adminLogout()" class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MODAL: AUTHORIZE MEMBER -->
+  <div id="modal-authorize" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="font-bold text-base text-teal-700 dark:text-teal-400">Authorize New Member</h3>
+          <p class="text-[11px] text-slate-500">Create pre-approved credentials</p>
+        </div>
+        <button onclick="closeAuthorizeModal()" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="auth-alert" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+
+      <form id="form-authorize" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Full Name</label>
+          <input type="text" id="auth-name" required placeholder="e.g. Aslam Khan" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Phone Number</label>
+          <input type="tel" id="auth-phone" required placeholder="e.g. 9876543210" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Auto Generated Username</label>
+          <input type="text" id="auth-username" readonly class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-teal-700 dark:text-teal-400 font-mono font-bold text-sm tracking-wider cursor-not-allowed" placeholder="REH-XXXX" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Email Address</label>
+          <input type="email" id="auth-email" required placeholder="member@domain.com" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Temporary Password</label>
+          <input type="password" id="auth-password" minlength="8" required placeholder="Minimum 8 characters" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+        </div>
+
+        <button type="submit" id="btn-submit-auth" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition">
+          Authorize & Register Member
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, secondaryAuth } from "../firebase-config.js";
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+    import { 
+      collection, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc, 
+      getDocs, 
+      serverTimestamp, 
+      query, 
+      orderBy 
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    // 1. Session & Auth Guard
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = "/";
+        return;
+      }
+      const adminSnap = await getDoc(doc(db, "admins", user.uid));
+      if (!adminSnap.exists()) {
+        alert("Access Denied: Administrative rights required.");
+        window.location.href = "/";
+        return;
+      }
+      loadMembersDirectory();
+      loadActiveLoans();
+    });
+
+    // 2. Drawer Controls
+    const drawerOverlay = document.getElementById("drawer-overlay");
+    const drawerMenu = document.getElementById("drawer-menu");
+
+    window.openDrawer = () => {
+      drawerOverlay.classList.remove("hidden");
+      drawerMenu.classList.remove("-translate-x-full");
+    };
+
+    window.closeDrawer = () => {
+      drawerOverlay.classList.add("hidden");
+      drawerMenu.classList.add("-translate-x-full");
+    };
+
+    document.getElementById("btn-open-drawer").addEventListener("click", openDrawer);
+    document.getElementById("btn-close-drawer").addEventListener("click", closeDrawer);
+    drawerOverlay.addEventListener("click", closeDrawer);
+
+    // 3. Tab Switching
+    window.switchMainTab = (tab) => {
+      const isLoans = tab === "loans";
+      document.getElementById("section-loans").classList.toggle("hidden", !isLoans);
+      document.getElementById("section-members").classList.toggle("hidden", isLoans);
+
+      document.getElementById("tab-btn-loans").className = isLoans
+        ? "flex-1 py-3 text-center text-xs font-bold border-b-2 border-teal-600 text-teal-600"
+        : "flex-1 py-3 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+
+      document.getElementById("tab-btn-members").className = !isLoans
+        ? "flex-1 py-3 text-center text-xs font-bold border-b-2 border-teal-600 text-teal-600"
+        : "flex-1 py-3 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+    };
+
+    // 4. Modal Controls
+    window.openAuthorizeModal = () => {
+      closeDrawer();
+      document.getElementById("modal-authorize").classList.remove("hidden");
+    };
+    window.closeAuthorizeModal = () => {
+      document.getElementById("modal-authorize").classList.add("hidden");
+      document.getElementById("form-authorize").reset();
+      document.getElementById("auth-alert").classList.add("hidden");
+    };
+
+    // 5. Dynamic Username Generator: REH-[Name 2 chars][2 Random phone digits]
+    const nameInput = document.getElementById("auth-name");
+    const phoneInput = document.getElementById("auth-phone");
+    const usernameInput = document.getElementById("auth-username");
+
+    function computeUsername() {
+      const name = nameInput.value.trim().replace(/[^a-zA-Z]/g, "");
+      const phone = phoneInput.value.trim().replace(/\D/g, "");
+
+      if (name.length >= 2 && phone.length >= 2) {
+        const namePart = name.substring(0, 2).toUpperCase();
+        // Pick 2 random digits from phone
+        const r1 = phone[Math.floor(Math.random() * phone.length)];
+        const r2 = phone[Math.floor(Math.random() * phone.length)];
+        usernameInput.value = `REH-${namePart}${r1}${r2}`;
+      } else {
+        usernameInput.value = "";
+      }
+    }
+
+    nameInput.addEventListener("input", computeUsername);
+    phoneInput.addEventListener("input", computeUsername);
+
+    // 6. Handle Member Authorization (Uses secondaryAuth to avoid admin logout)
+    document.getElementById("form-authorize").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btn-submit-auth");
+      const alertBox = document.getElementById("auth-alert");
+
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const username = usernameInput.value.trim();
+      const email = document.getElementById("auth-email").value.trim();
+      const password = document.getElementById("auth-password").value;
+
+      btn.disabled = true;
+      btn.textContent = "Authorizing...";
+
+      try {
+        // Create user in secondary instance
+        const userCred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+        const newUid = userCred.user.uid;
+
+        // Store pre-approved record in Firestore
+        await setDoc(doc(db, "users", newUid), {
+          uid: newUid,
+          name: name,
+          phone: phone,
+          email: email,
+          username: username,
+          loginCount: 0,
+          membershipStatus: "pending_registration",
+          authorizedAt: serverTimestamp(),
+          authorizedBy: auth.currentUser.uid
+        });
+
+        alertBox.className = "p-2.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
+        alertBox.textContent = `Member authorized successfully! Username: ${username}`;
+        alertBox.classList.remove("hidden");
+
+        document.getElementById("form-authorize").reset();
+        usernameInput.value = "";
+        loadMembersDirectory();
+      } catch (err) {
+        alertBox.className = "p-2.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300";
+        alertBox.textContent = err.message || "Failed to authorize member.";
+        alertBox.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Authorize & Register Member";
+      }
+    });
+
+    // 7. Load Directory & Render Members with Sub-Tabs (Info & Documents)
+    async function loadMembersDirectory() {
+      const container = document.getElementById("members-container");
+      try {
+        const q = query(collection(db, "users"), orderBy("authorizedAt", "desc"));
+        const snap = await getDocs(q);
+
+        document.getElementById("member-count").textContent = `${snap.size} Members`;
+        if (snap.empty) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No registered members found.</p>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        snap.forEach((docSnap) => {
+          const m = docSnap.data();
+          const uid = docSnap.id;
+          const statusColors = {
+            active: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+            pending_approval: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+            pending_registration: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+            rejected: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+          };
+          const badgeClass = statusColors[m.membershipStatus] || "bg-slate-100 text-slate-800";
+
+          const card = document.createElement("div");
+          card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3 shadow-sm";
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                ${
+                  m.avatarBase64 
+                  ? `<img src="${m.avatarBase64}" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" />`
+                  : `<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-teal-600 text-xs">${(m.name || 'M')[0]}</div>`
+                }
+                <div>
+                  <h4 class="font-bold text-sm">${m.name || 'Incomplete Profile'}</h4>
+                  <p class="text-[11px] text-slate-400 font-mono">${m.username || 'No Username'} • ${m.phone || 'No Phone'}</p>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${badgeClass}">
+                ${(m.membershipStatus || 'pending').replace('_', ' ')}
+              </span>
+            </div>
+
+            <!-- Sub-tabs header -->
+            <div class="flex border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold">
+              <button onclick="toggleMemberSubTab('${uid}', 'info')" id="btn-sub-info-${uid}" class="pb-1.5 border-b-2 border-teal-600 text-teal-600 mr-4">Info</button>
+              <button onclick="toggleMemberSubTab('${uid}', 'docs')" id="btn-sub-docs-${uid}" class="pb-1.5 border-b-2 border-transparent text-slate-400 hover:text-slate-600">Documents & KYC</button>
+            </div>
+
+            <!-- Sub-tab: Info -->
+            <div id="sub-info-${uid}" class="text-xs space-y-1 text-slate-600 dark:text-slate-300">
+              <p><span class="font-semibold text-slate-400">Email:</span> ${m.email || 'N/A'}</p>
+              <p><span class="font-semibold text-slate-400">Date of Birth:</span> ${m.dob || 'Not filled'}</p>
+              <p><span class="font-semibold text-slate-400">Residential Address:</span> ${m.address || 'Not filled'}</p>
+              <p><span class="font-semibold text-slate-400">Monthly Income:</span> ${m.monthlyIncome ? '₹' + m.monthlyIncome : 'Not declared'}</p>
+            </div>
+
+            <!-- Sub-tab: Documents & KYC -->
+            <div id="sub-docs-${uid}" class="hidden text-xs space-y-2">
+              <div class="grid grid-cols-2 gap-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <p><span class="font-semibold text-slate-400">Aadhaar:</span> ${m.aadharNumber ? '•••• ' + m.aadharNumber.slice(-4) : 'Pending'}</p>
+                <p><span class="font-semibold text-slate-400">PAN:</span> ${m.panNumber || 'Pending'}</p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center space-x-2 pt-2">
+                <button onclick="updateMemberApproval('${uid}', 'active')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition">Accept & Activate</button>
+                <button onclick="updateMemberApproval('${uid}', 'rejected')" class="flex-1 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition">Reject</button>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Error loading directory: ${err.message}</p>`;
+      }
+    }
+
+    // Sub-tab toggler for Member Card
+    window.toggleMemberSubTab = (uid, tab) => {
+      const isInfo = tab === 'info';
+      document.getElementById(`sub-info-${uid}`).classList.toggle("hidden", !isInfo);
+      document.getElementById(`sub-docs-${uid}`).classList.toggle("hidden", isInfo);
+
+      document.getElementById(`btn-sub-info-${uid}`).className = isInfo
+        ? "pb-1.5 border-b-2 border-teal-600 text-teal-600 mr-4"
+        : "pb-1.5 border-b-2 border-transparent text-slate-400 hover:text-slate-600 mr-4";
+
+      document.getElementById(`btn-sub-docs-${uid}`).className = !isInfo
+        ? "pb-1.5 border-b-2 border-teal-600 text-teal-600"
+        : "pb-1.5 border-b-2 border-transparent text-slate-400 hover:text-slate-600";
+    };
+
+    // Approval / Rejection Handler
+    window.updateMemberApproval = async (uid, newStatus) => {
+      if (!confirm(`Are you sure you want to mark this member as ${newStatus}?`)) return;
+      try {
+        await updateDoc(doc(db, "users", uid), {
+          membershipStatus: newStatus,
+          reviewedAt: serverTimestamp()
+        });
+        loadMembersDirectory();
+      } catch (err) {
+        alert("Failed to update status: " + err.message);
+      }
+    };
+
+    // 8. Load Active Loans
+    async function loadActiveLoans() {
+      const container = document.getElementById("loans-container");
+      try {
+        const snap = await getDocs(collection(db, "loans"));
+        document.getElementById("loan-count").textContent = `${snap.size} Active`;
+        if (snap.empty) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No current loans recorded.</p>`;
+          return;
+        }
+        container.innerHTML = "";
+        snap.forEach(docSnap => {
+          const l = docSnap.data();
+          const card = document.createElement("div");
+          card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-1 text-xs shadow-sm";
+          card.innerHTML = `
+            <div class="flex justify-between items-center">
+              <h4 class="font-bold text-sm">${l.memberName || 'Member'}</h4>
+              <span class="font-mono font-bold text-teal-600">₹${l.principalAmount || 0}</span>
+            </div>
+            <p class="text-slate-400">EMI: ₹${l.monthlyEmi || 0}/mo • Tenure: ${l.tenureMonths || 0} Months</p>
+            <p class="text-slate-400">Balance: ₹${l.remainingBalance || 0}</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No active loans found.</p>`;
+      }
+    }
+
+    // Logout
+    window.adminLogout = async () => {
+      await auth.signOut();
+      window.location.href = "/";
+    };
+  </script>
+</body>
+</html>
