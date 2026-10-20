@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark bg-[#0b1120]">
 <head>
-
-<link rel="icon" type="image/png" href="../icon.png" />
-<link rel="apple-touch-icon" href="../icon.png" />
-<link rel="manifest" href="../manifest.json" />
-  
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Rehnuma Society</title>
+  
+  <link rel="icon" type="image/png" href="../icon.png" />
+  <link rel="apple-touch-icon" href="../icon.png" />
+  <link rel="manifest" href="../manifest.json" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'media',
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -22,218 +22,267 @@
       }
     };
   </script>
+
+  <!-- Prevent Theme Flash -->
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('bg-[#0b1120]');
+      document.documentElement.classList.add('bg-slate-50');
+    }
+  </script>
+  
+  <style>
+    /* Prevent pull-to-refresh & overscroll */
+    body {
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Hide scrollbar for clean app look */
+    ::-webkit-scrollbar { display: none; }
+    
+    .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body id="app-body" style="display: none;" class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col antialiased select-none">
+<body id="app-body" class="bg-slate-50 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100 min-h-screen flex flex-col antialiased select-none opacity-0 transition-opacity duration-500">
 
   <!-- TOP APP BAR -->
-  <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+  <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
     <div class="flex items-center space-x-3">
-      <button id="btn-open-drawer" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition active:scale-95">
-        <svg class="w-6 h-6 text-slate-700 dark:text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button onclick="openDrawer()" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition active:scale-95 text-slate-700 dark:text-slate-200">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
       <div>
-        <h1 class="text-base font-extrabold text-teal-700 dark:text-teal-400 tracking-tight">Rehnuma Society</h1>
-        <p class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold">Management Console</p>
+        <h1 class="text-base font-extrabold text-teal-600 dark:text-teal-400 tracking-tight">Rehnuma Society</h1>
+        <p class="text-[10px] uppercase text-slate-500 font-semibold tracking-wider">Admin Portal</p>
       </div>
     </div>
-    <div class="flex items-center space-x-2">
-      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300">ADMIN</span>
+    
+    <!-- 3 Dots Context Menu Trigger -->
+    <div class="relative">
+      <button onclick="toggleContextMenu()" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 text-slate-700 dark:text-slate-200">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+        </svg>
+      </button>
+
+      <!-- Context Menu Dropdown -->
+      <div id="context-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-50 transform origin-top-right transition-all">
+        <button onclick="openInviteModal(); toggleContextMenu();" class="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center space-x-2">
+          <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          <span>Invite Member</span>
+        </button>
+        <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
+        <button onclick="triggerSignOutAction()" class="w-full text-left px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- NAVIGATION TABS -->
-  <nav class="flex border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-    <button onclick="switchMainTab('requests')" id="tab-btn-requests" class="flex-1 py-3 text-center text-xs font-bold border-b-2 border-teal-600 text-teal-600 transition">Authorize Members</button>
-    <button onclick="switchMainTab('members')" id="tab-btn-members" class="flex-1 py-3 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">All Members</button>
-    <button onclick="switchMainTab('loans')" id="tab-btn-loans" class="flex-1 py-3 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">Current Loans</button>
-  </nav>
+  <!-- MAIN VIEWPORT (Padding bottom added for bottom nav) -->
+  <main class="flex-1 w-full mx-auto pb-20">
 
-  <!-- MAIN VIEWPORT -->
-  <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-4">
+    <!-- TAB 1: DASHBOARD (Summary) -->
+    <section id="section-home" class="p-4 space-y-4 fade-in">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-teal-50 dark:bg-teal-900/30 p-4 rounded-2xl border border-teal-100 dark:border-teal-800/50">
+          <p class="text-[10px] uppercase font-bold text-teal-600 dark:text-teal-400">Total Active Members</p>
+          <h3 id="dash-members-count" class="text-2xl font-black text-slate-800 dark:text-slate-100 mt-1">0</h3>
+        </div>
+        <div class="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-2xl border border-amber-100 dark:border-amber-800/50">
+          <p class="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">Pending Requests</p>
+          <h3 id="dash-requests-count" class="text-2xl font-black text-slate-800 dark:text-slate-100 mt-1">0</h3>
+        </div>
+      </div>
+      <button onclick="openInviteModal()" class="w-full py-4 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center space-x-2 shadow-sm transition active:scale-[0.98]">
+        <div class="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        </div>
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">Create New Membership</span>
+      </button>
+    </section>
 
-    <!-- 1. TAB: AUTHORIZE MEMBERS (REQUESTS CENTER) -->
-    <section id="section-requests" class="space-y-3">
+    <!-- TAB 2: REQUESTS CENTER -->
+    <section id="section-requests" class="hidden p-4 space-y-3 fade-in">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Incoming Requests</h2>
-        <span id="requests-count" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800">0 Pending</span>
+        <span id="requests-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-400">0 Pending</span>
       </div>
       <div id="requests-container" class="space-y-3">
         <p class="text-xs text-slate-400 text-center py-10">Loading requests...</p>
       </div>
     </section>
 
-    <!-- 2. TAB: ALL ACTIVE MEMBERS DIRECTORY -->
-    <section id="section-members" class="hidden space-y-3">
+    <!-- TAB 3: ACTIVE DIRECTORY -->
+    <section id="section-members" class="hidden p-4 space-y-3 fade-in">
       <div class="flex justify-between items-center mb-2">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Active Society Roster</h2>
-        <span id="members-count" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800">0 Active</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Active Roster</h2>
+        <span id="members-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-400">0 Active</span>
       </div>
       <div id="members-container" class="space-y-3">
         <p class="text-xs text-slate-400 text-center py-10">Loading active members...</p>
       </div>
     </section>
 
-    <!-- 3. TAB: CURRENT LOANS -->
-    <section id="section-loans" class="hidden space-y-3">
+    <!-- TAB 4: CURRENT LOANS -->
+    <section id="section-loans" class="hidden p-4 space-y-3 fade-in">
       <div class="flex justify-between items-center mb-2">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Active Society Loans</h2>
-        <span id="loan-count" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800">0 Active</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Active Loans</h2>
+        <span id="loan-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300">0 Active</span>
       </div>
       <div id="loans-container" class="space-y-3">
-        <p class="text-xs text-slate-400 text-center py-10">No active loans found.</p>
+        <p class="text-xs text-slate-400 text-center py-10">Loading loans...</p>
       </div>
     </section>
 
   </main>
 
+  <!-- NATIVE BOTTOM NAVIGATION BAR -->
+  <nav class="fixed bottom-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-30 pb-safe">
+    <div class="flex justify-around items-center h-16">
+      <button onclick="switchBottomTab('home')" id="nav-btn-home" class="flex flex-col items-center justify-center w-full h-full text-teal-600 transition">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span class="text-[10px] font-bold">Home</span>
+      </button>
+      
+      <button onclick="switchBottomTab('requests')" id="nav-btn-requests" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition relative">
+        <div id="nav-badge-requests" class="hidden absolute top-1.5 right-6 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 border-white dark:border-slate-900"></div>
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-[10px] font-bold">Requests</span>
+      </button>
+
+      <button onclick="switchBottomTab('members')" id="nav-btn-members" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span class="text-[10px] font-bold">Directory</span>
+      </button>
+
+      <button onclick="switchBottomTab('loans')" id="nav-btn-loans" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-[10px] font-bold">Loans</span>
+      </button>
+    </div>
+  </nav>
+
   <!-- LEFT DRAWER OVERLAY -->
-  <div id="drawer-overlay" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 transition-opacity"></div>
+  <div id="drawer-overlay" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 transition-opacity" onclick="closeDrawer()"></div>
 
   <!-- LEFT DRAWER MENU -->
-  <aside id="drawer-menu" class="fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
-    <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+  <aside id="drawer-menu" class="fixed top-0 bottom-0 left-0 w-72 max-w-[80vw] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl">
+    <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
       <div>
-        <h3 class="font-bold text-teal-700 dark:text-teal-400 text-base">Rehnuma Society</h3>
-        <p class="text-[11px] text-slate-400">Administration Portal</p>
+        <h3 class="font-bold text-teal-600 dark:text-teal-400 text-base">Rehnuma</h3>
+        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Admin Panel</p>
       </div>
-      <button id="btn-close-drawer" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
+      <button onclick="closeDrawer()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
 
-    <div class="p-4 space-y-2 flex-1 overflow-y-auto">
-      <button onclick="openInviteModal()" class="w-full flex items-center space-x-3 px-3 py-3 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-bold text-xs transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-        </svg>
-        <span>Invite Member</span>
-      </button>
+    <div class="p-4 space-y-3 flex-1 overflow-y-auto">
+      <!-- Dark/Light Mode Toggle -->
+      <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="p-2 rounded-xl bg-white dark:bg-slate-700 text-slate-700 dark:text-amber-400 shadow-sm">
+            <svg id="theme-icon-sun" class="hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-slate-800 dark:text-slate-200">App Theme</p>
+            <p id="theme-status-text" class="text-[9px] text-slate-500 uppercase tracking-wider">Dark Mode</p>
+          </div>
+        </div>
+        <button id="theme-toggle-btn" class="relative inline-flex h-6 w-10 items-center rounded-full bg-teal-600 transition-colors focus:outline-none">
+          <span id="theme-toggle-knob" class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-5 shadow-sm"></span>
+        </button>
+      </div>
 
-      <button onclick="switchMainTab('requests'); closeDrawer();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition">
-        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>Authorize Members</span>
-      </button>
-
-      <button onclick="switchMainTab('members'); closeDrawer();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition">
-        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-        </svg>
-        <span>All Members</span>
-      </button>
-
-      <button onclick="switchMainTab('loans'); closeDrawer();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-xs transition">
-        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>Current Loans</span>
+      <button onclick="openInviteModal(); closeDrawer();" class="w-full flex items-center space-x-3 px-3 py-3.5 rounded-xl bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 font-bold text-xs transition border border-teal-100 dark:border-teal-800/50">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        <span>Invite New Member</span>
       </button>
     </div>
 
     <div class="p-4 border-t border-slate-200 dark:border-slate-800">
-      <button onclick="triggerSignOutAction()" class="w-full flex items-center justify-center space-x-2 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-        </svg>
-        <span>Sign Out</span>
+      <button onclick="triggerSignOutAction()" class="w-full flex items-center justify-center space-x-2 px-3 py-3 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <span>Secure Sign Out</span>
       </button>
     </div>
   </aside>
 
   <!-- MODAL: INVITE MEMBER -->
-  <div id="modal-invite" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+  <div id="modal-invite" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl transition-transform transform translate-y-0">
       <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
         <div>
-          <h3 class="font-bold text-base text-teal-700 dark:text-teal-400">Invite New Member</h3>
-          <p class="text-[11px] text-slate-500">Create pre-authorized credentials</p>
+          <h3 class="font-extrabold text-sm text-teal-600 dark:text-teal-400">Invite Member</h3>
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider">Create credentials</p>
         </div>
         <button onclick="closeInviteModal()" class="text-slate-400 hover:text-slate-600">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <div id="invite-alert" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
-
       <form id="form-invite" class="space-y-3">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Full Name</label>
-          <input type="text" id="invite-name" required placeholder="e.g. Aslam Khan" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1 text-slate-500">Full Name</label>
+          <input type="text" id="invite-name" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:border-teal-500 focus:outline-none" />
         </div>
-
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Phone Number</label>
-          <input type="tel" id="invite-phone" required placeholder="e.g. 9876543210" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1 text-slate-500">Phone Number</label>
+          <input type="tel" id="invite-phone" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:border-teal-500 focus:outline-none" />
         </div>
-
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Auto-Generated Username</label>
-          <input type="text" id="invite-username" readonly class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-teal-700 dark:text-teal-400 font-mono font-bold text-sm tracking-wider cursor-not-allowed" placeholder="REH-XXXX" />
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1 text-slate-500">Auto-Generated MID</label>
+          <input type="text" id="invite-username" readonly class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-teal-600 dark:text-teal-400 font-mono font-bold text-sm tracking-wider outline-none" placeholder="REH-XXXX" />
         </div>
-
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Email Address</label>
-          <input type="email" id="invite-email" required placeholder="member@domain.com" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1 text-slate-500">Email Address</label>
+          <input type="email" id="invite-email" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:border-teal-500 focus:outline-none" />
         </div>
-
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Temporary Password</label>
-          <input type="password" id="invite-password" minlength="8" required placeholder="Minimum 8 characters" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1 text-slate-500">Temporary Password</label>
+          <input type="password" id="invite-password" minlength="8" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:border-teal-500 focus:outline-none" />
         </div>
-
-        <button type="submit" id="btn-submit-invite" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition">
-          Issue Membership Invitation
+        <button type="submit" id="btn-submit-invite" class="w-full py-3 mt-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition">
+          Issue Invitation
         </button>
       </form>
     </div>
   </div>
 
-  <!-- NATIVE CONFIRM / ACTION MODAL (Replaces all browser popups) -->
-  <div id="native-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl">
-      <div class="space-y-1 text-center sm:text-left">
-        <h4 id="confirm-title" class="font-bold text-base text-slate-900 dark:text-slate-100">Confirm Action</h4>
-        <p id="confirm-desc" class="text-xs text-slate-500 leading-relaxed">Are you sure you want to proceed with this request?</p>
+  <!-- NATIVE CONFIRM MODAL -->
+  <div id="native-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+      <div class="space-y-1 text-center">
+        <h4 id="confirm-title" class="font-bold text-base text-slate-900 dark:text-slate-100">Confirm</h4>
+        <p id="confirm-desc" class="text-xs text-slate-500 leading-relaxed">Proceed with this action?</p>
       </div>
       <div class="flex space-x-2 pt-2">
-        <button id="btn-confirm-cancel" class="flex-1 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-          Cancel
-        </button>
-        <button id="btn-confirm-proceed" class="flex-1 py-2.5 rounded-xl text-white text-xs font-bold bg-teal-600 hover:bg-teal-700 transition">
-          Proceed
-        </button>
+        <button id="btn-confirm-cancel" class="flex-1 py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Cancel</button>
+        <button id="btn-confirm-proceed" class="flex-1 py-3 rounded-xl text-white text-xs font-bold bg-teal-600 hover:bg-teal-500 transition shadow-md">Proceed</button>
       </div>
     </div>
   </div>
 
-  <!-- NATIVE FLOATING TOAST NOTIFICATION -->
-  <div id="native-toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center space-x-2 transition-all duration-300">
+  <!-- NATIVE FLOATING TOAST -->
+  <div id="native-toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full shadow-xl text-xs font-bold flex items-center space-x-2 transition-all duration-300 w-max max-w-[90vw]">
     <span id="toast-icon">✓</span>
-    <span id="toast-text">Success message</span>
+    <span id="toast-text" class="truncate">Success message</span>
   </div>
 
   <script type="module">
     import { auth, db, rtdb, secondaryAuth } from "../firebase-config.js";
     import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-    import { 
-      collection, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      updateDoc, 
-      deleteDoc, 
-      getDocs, 
-      serverTimestamp, 
-      query, 
-      orderBy 
-    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { collection, doc, getDoc, setDoc, updateDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
     import { ref, get, set, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
     let activeAdminUid = null;
@@ -244,9 +293,7 @@
         window.location.replace("../index.html");
         return;
       }
-
       try {
-        // Step A: Admin check in Firestore
         const adminDoc = await getDoc(doc(db, "admins", user.uid));
         if (!adminDoc.exists()) {
           await auth.signOut();
@@ -254,7 +301,6 @@
           return;
         }
 
-        // Step B: Match session token with RTDB
         const localToken = sessionStorage.getItem("activeSessionToken");
         if (!localToken) {
           await auth.signOut();
@@ -264,89 +310,56 @@
 
         const sessionSnap = await get(ref(rtdb, `presence/${user.uid}/sessionToken`));
         if (!sessionSnap.exists() || sessionSnap.val() !== localToken) {
-          // Token mismatch: Another device logged in or session expired
           await auth.signOut();
           window.location.replace("../index.html");
           return;
         }
 
-        // All checks passed: Reveal dashboard
+        // Auth Success - Reveal UI smoothly
         activeAdminUid = user.uid;
-        document.getElementById("app-body").style.display = "flex";
-
-        // Load initial live consoles
+        document.getElementById("app-body").classList.remove("opacity-0");
+        
         loadIncomingRequests();
         loadActiveMembers();
         loadActiveLoans();
-
       } catch (err) {
-        console.error("Session verification failure:", err);
         window.location.replace("../index.html");
       }
     }
-
     auth.onAuthStateChanged(verifyAdminSession);
 
-    // --- 2. NATIVE IN-APP CONFIRMATION MODAL HELPER ---
-    function askNativeConfirm(title, desc, confirmButtonText, isDestructive = false) {
-      return new Promise((resolve) => {
-        const modal = document.getElementById("native-confirm-modal");
-        const titleEl = document.getElementById("confirm-title");
-        const descEl = document.getElementById("confirm-desc");
-        const proceedBtn = document.getElementById("btn-confirm-proceed");
-        const cancelBtn = document.getElementById("btn-confirm-cancel");
-
-        titleEl.textContent = title;
-        descEl.textContent = desc;
-        proceedBtn.textContent = confirmButtonText;
-
-        proceedBtn.className = isDestructive
-          ? "flex-1 py-2.5 rounded-xl text-white text-xs font-bold bg-rose-600 hover:bg-rose-700 transition"
-          : "flex-1 py-2.5 rounded-xl text-white text-xs font-bold bg-teal-600 hover:bg-teal-700 transition";
-
-        modal.classList.remove("hidden");
-
-        const handleProceed = () => {
-          modal.classList.add("hidden");
-          cleanup();
-          resolve(true);
-        };
-
-        const handleCancel = () => {
-          modal.classList.add("hidden");
-          cleanup();
-          resolve(false);
-        };
-
-        function cleanup() {
-          proceedBtn.removeEventListener("click", handleProceed);
-          cancelBtn.removeEventListener("click", handleCancel);
+    // --- 2. BOTTOM NAVIGATION ENGINE ---
+    window.switchBottomTab = (tab) => {
+      const tabs = ["home", "requests", "members", "loans"];
+      tabs.forEach(t => {
+        // Sections visibility
+        document.getElementById(`section-${t}`).classList.toggle("hidden", t !== tab);
+        
+        // Icon color highlighting
+        const btn = document.getElementById(`nav-btn-${t}`);
+        if (t === tab) {
+          btn.className = "flex flex-col items-center justify-center w-full h-full text-teal-600 transition";
+        } else {
+          btn.className = "flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition relative";
         }
-
-        proceedBtn.addEventListener("click", handleProceed);
-        cancelBtn.addEventListener("click", handleCancel);
       });
-    }
-
-    // --- 3. NATIVE TOAST HELPER ---
-    window.showToast = (msg, isError = false) => {
-      const toast = document.getElementById("native-toast");
-      const icon = document.getElementById("toast-icon");
-      const text = document.getElementById("toast-text");
-
-      text.textContent = msg;
-      icon.textContent = isError ? "✕" : "✓";
-      toast.className = isError
-        ? "fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center space-x-2 bg-rose-600 text-white transition-all duration-300"
-        : "fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center space-x-2 bg-teal-700 text-white transition-all duration-300";
-
-      toast.classList.remove("hidden");
-      setTimeout(() => {
-        toast.classList.add("hidden");
-      }, 3000);
+      // Close dropdown if open
+      document.getElementById("context-menu").classList.add("hidden");
     };
 
-    // --- 4. DRAWER CONTROLS ---
+    // --- 3. CONTEXT MENU & DRAWER ---
+    window.toggleContextMenu = () => {
+      document.getElementById("context-menu").classList.toggle("hidden");
+    };
+    
+    // Close context menu when clicking outside
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("context-menu");
+      if (!e.target.closest(".relative") && !menu.classList.contains("hidden")) {
+        menu.classList.add("hidden");
+      }
+    });
+
     const drawerOverlay = document.getElementById("drawer-overlay");
     const drawerMenu = document.getElementById("drawer-menu");
 
@@ -354,38 +367,87 @@
       drawerOverlay.classList.remove("hidden");
       drawerMenu.classList.remove("-translate-x-full");
     };
-
     window.closeDrawer = () => {
       drawerOverlay.classList.add("hidden");
       drawerMenu.classList.add("-translate-x-full");
     };
 
-    document.getElementById("btn-open-drawer").addEventListener("click", openDrawer);
-    document.getElementById("btn-close-drawer").addEventListener("click", closeDrawer);
-    drawerOverlay.addEventListener("click", closeDrawer);
+    // --- 4. THEME TOGGLE SWITCHER ---
+    const themeToggleBtn = document.getElementById("theme-toggle-btn");
+    const themeKnob = document.getElementById("theme-toggle-knob");
+    const sunIcon = document.getElementById("theme-icon-sun");
+    const moonIcon = document.getElementById("theme-icon-moon");
+    const themeStatusText = document.getElementById("theme-status-text");
 
-    // --- 5. TAB SWITCHING ---
-    window.switchMainTab = (tab) => {
-      const tabs = ["requests", "members", "loans"];
-      tabs.forEach(t => {
-        const isCurrent = t === tab;
-        document.getElementById(`section-${t}`).classList.toggle("hidden", !isCurrent);
-        const btn = document.getElementById(`tab-btn-${t}`);
-        btn.className = isCurrent
-          ? "flex-1 py-3 text-center text-xs font-bold border-b-2 border-teal-600 text-teal-600 transition"
-          : "flex-1 py-3 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+    function syncThemeUI(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark', 'bg-[#0b1120]');
+        document.documentElement.classList.remove('bg-slate-50');
+        themeKnob.className = "inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-5 shadow-sm";
+        themeToggleBtn.className = "relative inline-flex h-6 w-10 items-center rounded-full bg-teal-600 transition-colors focus:outline-none";
+        sunIcon.classList.add("hidden");
+        moonIcon.classList.remove("hidden");
+        themeStatusText.textContent = "Dark Mode";
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove('dark', 'bg-[#0b1120]');
+        document.documentElement.classList.add('bg-slate-50');
+        themeKnob.className = "inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1 shadow-sm";
+        themeToggleBtn.className = "relative inline-flex h-6 w-10 items-center rounded-full bg-slate-300 dark:bg-slate-600 transition-colors focus:outline-none";
+        sunIcon.classList.remove("hidden");
+        moonIcon.classList.add("hidden");
+        themeStatusText.textContent = "Light Mode";
+        localStorage.setItem("theme", "light");
+      }
+    }
+    syncThemeUI(localStorage.getItem('theme') !== 'light');
+    themeToggleBtn.addEventListener("click", () => {
+      syncThemeUI(!document.documentElement.classList.contains("dark"));
+    });
+
+    // --- 5. UI COMPONENTS (Toast & Confirm) ---
+    window.showToast = (msg, isError = false) => {
+      const toast = document.getElementById("native-toast");
+      const icon = document.getElementById("toast-icon");
+      const text = document.getElementById("toast-text");
+      text.textContent = msg;
+      icon.textContent = isError ? "✕" : "✓";
+      toast.className = isError
+        ? "fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full shadow-xl text-xs font-bold flex items-center space-x-2 bg-rose-900 border border-rose-700 text-rose-100 transition-all duration-300 w-max max-w-[90vw]"
+        : "fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full shadow-xl text-xs font-bold flex items-center space-x-2 bg-teal-900 border border-teal-700 text-teal-100 transition-all duration-300 w-max max-w-[90vw]";
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 3000);
+    };
+
+    function askNativeConfirm(title, desc, confirmText, isDestructive = false) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById("native-confirm-modal");
+        document.getElementById("confirm-title").textContent = title;
+        document.getElementById("confirm-desc").textContent = desc;
+        const proceedBtn = document.getElementById("btn-confirm-proceed");
+        const cancelBtn = document.getElementById("btn-confirm-cancel");
+        proceedBtn.textContent = confirmText;
+        proceedBtn.className = isDestructive
+          ? "flex-1 py-3 rounded-xl text-white text-xs font-bold bg-rose-600 hover:bg-rose-500 transition shadow-md"
+          : "flex-1 py-3 rounded-xl text-white text-xs font-bold bg-teal-600 hover:bg-teal-500 transition shadow-md";
+        modal.classList.remove("hidden");
+
+        const cleanup = () => {
+          modal.classList.add("hidden");
+          proceedBtn.replaceWith(proceedBtn.cloneNode(true));
+          cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+        };
+        document.getElementById("btn-confirm-proceed").addEventListener("click", () => { cleanup(); resolve(true); });
+        document.getElementById("btn-confirm-cancel").addEventListener("click", () => { cleanup(); resolve(false); });
       });
-    };
+    }
 
-    // --- 6. MODAL: INVITE MEMBER & USERNAME COMPUTATION ---
-    window.openInviteModal = () => {
-      closeDrawer();
-      document.getElementById("modal-invite").classList.remove("hidden");
-    };
-    window.closeInviteModal = () => {
+    // --- 6. INVITE MEMBER LOGIC ---
+    window.openInviteModal = () => { document.getElementById("modal-invite").classList.remove("hidden"); };
+    window.closeInviteModal = () => { 
       document.getElementById("modal-invite").classList.add("hidden");
       document.getElementById("form-invite").reset();
-      document.getElementById("invite-alert").classList.add("hidden");
+      document.getElementById("invite-username").value = "";
     };
 
     const nameInput = document.getElementById("invite-name");
@@ -393,291 +455,183 @@
     const usernameInput = document.getElementById("invite-username");
 
     function computeUsername() {
-      const name = nameInput.value.trim().replace(/[^a-zA-Z]/g, "");
-      const phone = phoneInput.value.trim().replace(/\D/g, "");
-
-      if (name.length >= 2 && phone.length >= 2) {
-        const namePart = name.substring(0, 2).toUpperCase();
-        const r1 = phone[Math.floor(Math.random() * phone.length)];
-        const r2 = phone[Math.floor(Math.random() * phone.length)];
-        usernameInput.value = `REH-${namePart}${r1}${r2}`;
+      const n = nameInput.value.trim().replace(/[^a-zA-Z]/g, "");
+      const p = phoneInput.value.trim().replace(/\D/g, "");
+      if (n.length >= 2 && p.length >= 2) {
+        usernameInput.value = `REH-${n.substring(0, 2).toUpperCase()}${p[Math.floor(Math.random()*p.length)]}${p[Math.floor(Math.random()*p.length)]}`;
       } else {
         usernameInput.value = "";
       }
     }
-
     nameInput.addEventListener("input", computeUsername);
     phoneInput.addEventListener("input", computeUsername);
 
-    // Handle Member Invitation
     document.getElementById("form-invite").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("btn-submit-invite");
-      const alertBox = document.getElementById("invite-alert");
-
-      const name = nameInput.value.trim();
-      const phone = phoneInput.value.trim();
-      const username = usernameInput.value.trim();
-      const email = document.getElementById("invite-email").value.trim();
-      const password = document.getElementById("invite-password").value;
-
-      btn.disabled = true;
-      btn.textContent = "Issuing Invitation...";
-
+      btn.disabled = true; btn.textContent = "Processing...";
       try {
-        const userCred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-        const newUid = userCred.user.uid;
-
-        await setDoc(doc(db, "users", newUid), {
-          uid: newUid,
-          name: name,
-          phone: phone,
-          email: email,
-          username: username,
+        const cred = await createUserWithEmailAndPassword(secondaryAuth, document.getElementById("invite-email").value.trim(), document.getElementById("invite-password").value);
+        await setDoc(doc(db, "users", cred.user.uid), {
+          uid: cred.user.uid,
+          name: nameInput.value.trim(),
+          phone: phoneInput.value.trim(),
+          email: document.getElementById("invite-email").value.trim(),
+          username: usernameInput.value,
           loginCount: 0,
           membershipStatus: "pending_registration",
           authorizedAt: serverTimestamp(),
           invitedBy: activeAdminUid
         });
-
-        alertBox.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
-        alertBox.textContent = `Member invited successfully! Username: ${username}`;
-        alertBox.classList.remove("hidden");
-
-        document.getElementById("form-invite").reset();
-        usernameInput.value = "";
-        showToast("Invitation issued successfully!");
+        showToast("Invitation generated successfully!");
+        closeInviteModal();
         loadIncomingRequests();
       } catch (err) {
-        alertBox.className = "p-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300";
-        alertBox.textContent = err.message || "Failed to invite member.";
-        alertBox.classList.remove("hidden");
+        showToast(err.message, true);
       } finally {
-        btn.disabled = false;
-        btn.textContent = "Issue Membership Invitation";
+        btn.disabled = false; btn.textContent = "Issue Invitation";
       }
     });
 
-    // --- 7. LOAD AUTHORIZE MEMBERS (REQUESTS CONSOLE) ---
+    // --- 7. LOAD REQUESTS, ROSTER & LOANS ---
     async function loadIncomingRequests() {
       const container = document.getElementById("requests-container");
       try {
-        const q = query(collection(db, "users"), orderBy("authorizedAt", "desc"));
-        const snap = await getDocs(q);
-
-        const requests = [];
+        const snap = await getDocs(query(collection(db, "users"), orderBy("authorizedAt", "desc")));
+        const reqs = [];
         snap.forEach(d => {
-          const data = d.data();
-          if (data.membershipStatus === "pending_approval" || data.membershipStatus === "pending_registration") {
-            requests.push({ id: d.id, ...data });
-          }
+          const s = d.data().membershipStatus;
+          if (s === "pending_approval" || s === "pending_registration") reqs.push({ id: d.id, ...d.data() });
         });
+        
+        // Update counts & badge notification
+        document.getElementById("dash-requests-count").textContent = reqs.length;
+        document.getElementById("requests-count-badge").textContent = `${reqs.length} Pending`;
+        const badge = document.getElementById("nav-badge-requests");
+        if (reqs.length > 0) badge.classList.remove("hidden"); else badge.classList.add("hidden");
 
-        document.getElementById("requests-count").textContent = `${requests.length} Pending`;
-
-        if (requests.length === 0) {
-          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">No pending membership requests.</p>`;
-          return;
-        }
+        if (reqs.length === 0) { container.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">No pending requests.</p>`; return; }
 
         container.innerHTML = "";
-        requests.forEach(r => {
-          const card = document.createElement("div");
-          card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm";
-          card.innerHTML = `
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                ${
-                  r.avatarBase64 
-                  ? `<img src="${r.avatarBase64}" class="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700" />`
-                  : `<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-teal-600 text-sm">${(r.name || 'M')[0]}</div>`
-                }
-                <div>
-                  <h4 class="font-bold text-sm text-slate-900 dark:text-slate-100">${r.name || 'Incomplete Profile'}</h4>
-                  <p class="text-[11px] text-slate-400 font-mono">${r.username || 'No MID'} • ${r.phone || 'No Phone'}</p>
+        reqs.forEach(r => {
+          const statusColors = r.membershipStatus === 'pending_registration' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-400';
+          const statusText = r.membershipStatus === 'pending_registration' ? 'Pending KYC' : 'Review Required';
+          
+          container.innerHTML += `
+            <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 space-y-3 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  ${r.avatarBase64 ? `<img src="${r.avatarBase64}" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-600" />` : `<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-teal-600 text-xs">${(r.name||'M')[0]}</div>`}
+                  <div>
+                    <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${r.name||'Incomplete'}</h4>
+                    <p class="text-[10px] text-slate-400 font-mono">${r.username||'No MID'} • ${r.phone||''}</p>
+                  </div>
                 </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${statusColors}">${statusText}</span>
               </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                ${(r.membershipStatus || 'pending').replace('_', ' ')}
-              </span>
-            </div>
-
-            <!-- KYC Details -->
-            <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-              <p><span class="font-semibold text-slate-400">Email:</span> ${r.email || 'N/A'}</p>
-              <p><span class="font-semibold text-slate-400">Income:</span> ${r.monthlyIncome ? '₹' + r.monthlyIncome : 'N/A'}</p>
-              <p><span class="font-semibold text-slate-400">Address:</span> ${r.address || 'Pending'}</p>
-              <p><span class="font-semibold text-slate-400">DOB:</span> ${r.dob || 'Pending'}</p>
-            </div>
-
-            <!-- 3 ACTIONS: Pending, Authorize, Delete -->
-            <div class="grid grid-cols-3 gap-2 pt-1">
-              <button onclick="handleRequestPending('${r.id}')" class="py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition">
-                Pending
-              </button>
-              <button onclick="handleRequestAuthorize('${r.id}')" class="py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition">
-                Authorize
-              </button>
-              <button onclick="handleRequestDelete('${r.id}')" class="py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition">
-                Delete
-              </button>
+              ${r.membershipStatus === 'pending_approval' ? `
+                <div class="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+                  <p><span class="text-slate-500 font-semibold">Income:</span> ₹${r.monthlyIncome||0}</p>
+                  <p><span class="text-slate-500 font-semibold">PAN:</span> ${r.panNumber||'N/A'}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <button onclick="handleReqAuth('${r.id}')" class="py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition shadow-sm">Authorize</button>
+                  <button onclick="handleReqDel('${r.id}')" class="py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-sm">Delete</button>
+                </div>
+              ` : `
+                 <button onclick="handleReqDel('${r.id}')" class="w-full py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl text-xs font-bold transition">Revoke Invitation</button>
+              `}
             </div>
           `;
-          container.appendChild(card);
         });
-      } catch (err) {
-        container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Error loading requests: ${err.message}</p>`;
-      }
+      } catch (e) {}
     }
 
-    // Action 1: Pending (Keep untouched/alert)
-    window.handleRequestPending = (uid) => {
-      showToast("Request left in pending queue.");
+    window.handleReqAuth = async (uid) => {
+      if (await askNativeConfirm("Authorize Member", "Approve membership and activate portal access?", "Authorize")) {
+        try {
+          await updateDoc(doc(db, "users", uid), { membershipStatus: "active", authorizedAt: serverTimestamp() });
+          showToast("Member authorized."); loadIncomingRequests(); loadActiveMembers();
+        } catch(e) { showToast(e.message, true); }
+      }
     };
-
-    // Action 2: Authorize (Accept & Activate Membership)
-    window.handleRequestAuthorize = async (uid) => {
-      const confirmed = await askNativeConfirm(
-        "Authorize Member",
-        "This will officially grant full membership access and issue active credentials.",
-        "Authorize & Activate"
-      );
-      if (!confirmed) return;
-
-      try {
-        await updateDoc(doc(db, "users", uid), {
-          membershipStatus: "active",
-          authorizedAt: serverTimestamp()
-        });
-        showToast("Member successfully authorized!");
-        loadIncomingRequests();
-        loadActiveMembers();
-      } catch (err) {
-        showToast("Failed to authorize: " + err.message, true);
+    window.handleReqDel = async (uid) => {
+      if (await askNativeConfirm("Delete Request", "Permanently deny this membership request?", "Delete & Deny", true)) {
+        try {
+          await setDoc(doc(db, "users", uid), { uid: uid, membershipStatus: "denied", deniedAt: serverTimestamp() });
+          showToast("Request denied."); loadIncomingRequests();
+        } catch(e) { showToast(e.message, true); }
       }
     };
 
-    // Action 3: Delete (Full Data Wipe + Denied Marker)
-    window.handleRequestDelete = async (uid) => {
-      const confirmed = await askNativeConfirm(
-        "Delete & Deny Request",
-        "This will permanently delete all personal records from database. When this user logs in, they will see 'Your request has been Denied by admin.'",
-        "Delete & Deny",
-        true
-      );
-      if (!confirmed) return;
-
-      try {
-        // Step 1: Wipe all personal info and store denied marker
-        await setDoc(doc(db, "users", uid), {
-          uid: uid,
-          membershipStatus: "denied",
-          deniedAt: serverTimestamp()
-        });
-
-        showToast("Request permanently deleted & denied.");
-        loadIncomingRequests();
-      } catch (err) {
-        showToast("Error wiping records: " + err.message, true);
-      }
-    };
-
-    // --- 8. LOAD ALL ACTIVE MEMBERS ---
     async function loadActiveMembers() {
       const container = document.getElementById("members-container");
       try {
-        const q = query(collection(db, "users"), orderBy("authorizedAt", "desc"));
-        const snap = await getDocs(q);
-
-        const activeList = [];
-        snap.forEach(d => {
-          if (d.data().membershipStatus === "active") {
-            activeList.push(d.data());
-          }
-        });
-
-        document.getElementById("members-count").textContent = `${activeList.length} Active`;
-        if (activeList.length === 0) {
-          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">No active members found.</p>`;
-          return;
-        }
-
+        const snap = await getDocs(query(collection(db, "users"), orderBy("authorizedAt", "desc")));
+        const active = [];
+        snap.forEach(d => { if(d.data().membershipStatus === "active") active.push(d.data()); });
+        
+        document.getElementById("dash-members-count").textContent = active.length;
+        document.getElementById("members-count-badge").textContent = `${active.length} Active`;
+        if (active.length === 0) { container.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">No active members.</p>`; return; }
+        
         container.innerHTML = "";
-        activeList.forEach(m => {
-          const card = document.createElement("div");
-          card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm";
-          card.innerHTML = `
-            <div class="flex items-center space-x-3">
-              ${
-                m.avatarBase64 
-                ? `<img src="${m.avatarBase64}" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" />`
-                : `<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-teal-600 text-xs">${(m.name || 'M')[0]}</div>`
-              }
-              <div>
-                <h4 class="font-bold text-sm">${m.name || 'Member'}</h4>
-                <p class="text-[11px] text-slate-400 font-mono">${m.username || 'No MID'} • ${m.phone || 'No Phone'}</p>
+        active.forEach(m => {
+          container.innerHTML += `
+            <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+              <div class="flex items-center space-x-3">
+                ${m.avatarBase64 ? `<img src="${m.avatarBase64}" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-600" />` : `<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-teal-600 text-xs">${(m.name||'M')[0]}</div>`}
+                <div>
+                  <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${m.name||'Member'}</h4>
+                  <p class="text-[10px] text-slate-400 font-mono">${m.username||'MID'} • ${m.phone||''}</p>
+                </div>
               </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-400">Active</span>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-              ACTIVE
-            </span>
           `;
-          container.appendChild(card);
         });
-      } catch (err) {
-        container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Error loading roster: ${err.message}</p>`;
-      }
+      } catch(e) {}
     }
 
-    // --- 9. LOAD CURRENT LOANS ---
     async function loadActiveLoans() {
       const container = document.getElementById("loans-container");
       try {
         const snap = await getDocs(collection(db, "loans"));
-        document.getElementById("loan-count").textContent = `${snap.size} Active`;
-        if (snap.empty) {
-          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">No current loans recorded.</p>`;
-          return;
-        }
+        document.getElementById("loan-count-badge").textContent = `${snap.size} Active`;
+        if (snap.empty) { container.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">No loans active.</p>`; return; }
+        
         container.innerHTML = "";
-        snap.forEach(docSnap => {
-          const l = docSnap.data();
-          const card = document.createElement("div");
-          card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-1 text-xs shadow-sm";
-          card.innerHTML = `
-            <div class="flex justify-between items-center">
-              <h4 class="font-bold text-sm">${l.memberName || 'Member'}</h4>
-              <span class="font-mono font-bold text-teal-600">₹${l.principalAmount || 0}</span>
+        snap.forEach(d => {
+          const l = d.data();
+          container.innerHTML += `
+            <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 space-y-1.5 shadow-sm text-xs">
+              <div class="flex justify-between items-center">
+                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${l.memberName||'Member'}</h4>
+                <span class="font-mono font-bold text-teal-600 dark:text-teal-400">₹${l.principalAmount||0}</span>
+              </div>
+              <p class="text-slate-500">EMI: ₹${l.monthlyEmi||0}/mo • Tenure: ${l.tenureMonths||0} Months</p>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                <span class="text-slate-400 font-semibold text-[10px] uppercase">Balance Due</span>
+                <span class="font-mono font-bold text-rose-500">₹${l.remainingBalance||0}</span>
+              </div>
             </div>
-            <p class="text-slate-400">EMI: ₹${l.monthlyEmi || 0}/mo • Tenure: ${l.tenureMonths || 0} Months</p>
-            <p class="text-slate-400">Balance: ₹${l.remainingBalance || 0}</p>
           `;
-          container.appendChild(card);
         });
-      } catch (err) {
-        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-10">No active loans found.</p>`;
-      }
+      } catch(e) {}
     }
 
-    // --- 10. SIGN OUT ACTION ---
+    // --- 8. SECURE SIGN OUT ---
     window.triggerSignOutAction = async () => {
-      const confirmed = await askNativeConfirm(
-        "Sign Out",
-        "Are you sure you want to exit the administration console?",
-        "Sign Out"
-      );
-      if (!confirmed) return;
-
-      if (activeAdminUid) {
-        await set(ref(rtdb, `presence/${activeAdminUid}`), {
-          state: "offline",
-          sessionToken: null,
-          lastActive: rtdbTimestamp()
-        });
+      if (await askNativeConfirm("Sign Out", "End administration session?", "Sign Out", true)) {
+        try {
+          if (activeAdminUid) {
+            await set(ref(rtdb, `presence/${activeAdminUid}`), { state: "offline", sessionToken: null, lastActive: rtdbTimestamp() });
+          }
+        } catch(e) {}
+        sessionStorage.removeItem("activeSessionToken");
+        await auth.signOut();
+        window.location.replace("../index.html");
       }
-      sessionStorage.removeItem("activeSessionToken");
-      await auth.signOut();
-      window.location.replace("../index.html");
     };
   </script>
 </body>
