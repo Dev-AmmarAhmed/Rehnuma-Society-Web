@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  
-<link rel="icon" type="image/png" href="../icon.png" />
-<link rel="apple-touch-icon" href="../icon.png" />
-<link rel="manifest" href="../manifest.json" />
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rehnuma Society | Member Dashboard</title>
+  <title>Rehnuma Society</title>
+
+  <link rel="icon" type="image/png" href="../icon.png" />
+  <link rel="apple-touch-icon" href="../icon.png" />
+  <link rel="manifest" href="../manifest.json" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'media',
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -22,434 +22,588 @@
       }
     };
   </script>
-</head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col pb-20">
 
-  <!-- TOP HEADER -->
-  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+  <!-- Prevent Theme Flash -->
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+</head>
+<body id="app-body" style="display: none;" class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col antialiased select-none">
+
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
     <div class="flex items-center space-x-3">
-      <div id="member-avatar-container" class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
-        <span id="member-avatar-fallback" class="font-bold text-teal-600 text-sm">M</span>
-        <img id="member-avatar-img" class="hidden w-full h-full object-cover" />
-      </div>
+      <button id="btn-open-drawer" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition active:scale-95">
+        <svg class="w-6 h-6 text-slate-700 dark:text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
       <div>
-        <h1 id="member-name-header" class="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">Loading...</h1>
-        <div class="flex items-center space-x-2 mt-0.5">
-          <span id="member-id-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300">MID: ---</span>
-          <span id="member-online-status" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        </div>
+        <h1 class="text-base font-extrabold text-teal-700 dark:text-teal-400 tracking-tight">Rehnuma Society</h1>
+        <p class="text-[10px] uppercase text-slate-400 tracking-wider font-semibold">Member Portal</p>
       </div>
     </div>
-    <button onclick="memberLogout()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
-      Sign Out
-    </button>
+    <div class="flex items-center space-x-2">
+      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">ACTIVE</span>
+    </div>
   </header>
 
-  <!-- MAIN ACTION: MONTHLY INSTALLMENT BUTTON -->
-  <div class="max-w-md w-full mx-auto p-4 pt-6">
-    <button id="btn-pay-installment" class="w-full py-4 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-teal-700/20 active:scale-[0.98] transition-all flex flex-col items-center justify-center space-y-1">
-      <span class="tracking-wide">Monthly installment pay ₹1000</span>
-      <span class="text-[10px] font-normal opacity-80">MDBTW Association Mutual Welfare Fund</span>
-    </button>
-    <div id="deposit-alert" class="hidden mt-3 p-3 rounded-xl text-xs font-semibold"></div>
-  </div>
+  <!-- MAIN SCROLLABLE VIEWPORT -->
+  <main class="flex-1 max-w-lg w-full mx-auto p-4 space-y-5">
 
-  <!-- TAB CONTENTS CONTAINER -->
-  <main class="flex-1 max-w-md w-full mx-auto px-4 pb-6 space-y-4">
-
-    <!-- 1. TAB: HOME -->
-    <section id="tab-content-home" class="space-y-4">
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
-        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">Society Overview</h2>
-          <span class="text-[10px] text-slate-400 font-semibold">MDBTW Association</span>
+    <!-- 1. MEMBER IDENTITY CARD -->
+    <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+      <div class="flex items-center space-x-4">
+        <div class="relative w-16 h-16 rounded-full overflow-hidden border-2 border-teal-500 flex-shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+          <img id="member-avatar" class="hidden w-full h-full object-cover" />
+          <span id="member-initial" class="text-xl font-black text-teal-600">R</span>
         </div>
-        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-          Welcome to Rehnuma Society. Our welfare platform operates strictly without interest, providing mutual financial assistance and zero-cost micro-loans for all verified members.
-        </p>
+        <div class="space-y-0.5">
+          <h2 id="member-name" class="font-extrabold text-base text-slate-900 dark:text-slate-100">Member Name</h2>
+          <p id="member-mid" class="text-xs font-mono font-bold text-teal-600 dark:text-teal-400">MID: REH-XXXX</p>
+          <p id="member-phone" class="text-[11px] text-slate-400">Phone: +91 ----------</p>
+        </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-2 shadow-sm">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Your Account Summary</h3>
-        <div class="grid grid-cols-2 gap-3 pt-1">
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
-            <span class="text-[10px] text-slate-400 font-semibold block">Total Deposited</span>
-            <span id="home-total-deposited" class="text-sm font-bold text-teal-600 font-mono">₹0</span>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
-            <span class="text-[10px] text-slate-400 font-semibold block">Active Loan</span>
-            <span id="home-loan-status" class="text-sm font-bold text-slate-600 dark:text-slate-300">None</span>
-          </div>
+      <!-- Financial Balance Strip -->
+      <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+        <div class="p-3 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-100 dark:border-teal-900/40">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-teal-700 dark:text-teal-300">Total Deposited</span>
+          <p id="total-deposit-amt" class="text-lg font-black text-teal-800 dark:text-teal-200 font-mono mt-0.5">₹0</p>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Active Loan Due</span>
+          <p id="total-loan-due" class="text-lg font-black text-slate-800 dark:text-slate-200 font-mono mt-0.5">₹0</p>
         </div>
       </div>
     </section>
 
-    <!-- 2. TAB: DEPOSIT -->
-    <section id="tab-content-deposit" class="hidden space-y-3">
-      <div class="flex justify-between items-center">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Installment Ledger</h2>
-        <span class="text-[11px] font-mono text-teal-600 font-bold" id="deposit-summary-total">Total: ₹0</span>
-      </div>
+    <!-- 2. QUICK ACTIONS (DEPOSIT & LOAN) -->
+    <section class="grid grid-cols-2 gap-3">
+      <button onclick="triggerQuickDeposit()" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white shadow-md transition active:scale-[0.98] space-y-1.5">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        <span class="text-xs font-extrabold uppercase tracking-wider">Pay ₹1,000</span>
+        <span class="text-[10px] opacity-80">Monthly Installment</span>
+      </button>
 
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-        <table class="w-full text-xs text-left">
-          <thead class="bg-slate-100 dark:bg-slate-800/60 text-slate-500 uppercase text-[10px] font-bold">
-            <tr>
-              <th class="p-3">Month</th>
-              <th class="p-3 text-right">Installment</th>
-              <th class="p-3 text-right">Deposit</th>
-            </tr>
-          </thead>
-          <tbody id="deposit-table-rows" class="divide-y divide-slate-100 dark:divide-slate-800 font-mono">
-            <tr>
-              <td colspan="3" class="p-4 text-center text-slate-400 font-sans text-xs">No deposit records found.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <button onclick="openLoanModal()" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-[0.98] space-y-1.5">
+        <svg class="w-6 h-6 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span class="text-xs font-extrabold uppercase tracking-wider">Apply Loan</span>
+        <span class="text-[10px] text-slate-400">Interest-Free Micro Loan</span>
+      </button>
     </section>
 
-    <!-- 3. TAB: LOAN FORM -->
-    <section id="tab-content-loan" class="hidden space-y-4">
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
-        <div class="border-b border-slate-100 dark:border-slate-800 pb-2">
-          <h2 class="text-sm font-bold text-teal-700 dark:text-teal-400">Apply for Interest-Free Loan</h2>
-          <p class="text-[11px] text-slate-400">Strictly 0% interest non-commercial welfare loan</p>
-        </div>
-
-        <div id="loan-alert" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
-
-        <form id="form-loan-apply" class="space-y-3">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Required Amount (₹)</label>
-            <input type="number" id="loan-amount" min="1000" step="500" required placeholder="e.g. 20000" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono focus:ring-2 focus:ring-teal-600 focus:outline-none" />
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Repayment Tenure (Months)</label>
-            <input type="number" id="loan-tenure" min="1" max="36" required placeholder="e.g. 13" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono focus:ring-2 focus:ring-teal-600 focus:outline-none" />
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Purpose of Loan</label>
-            <textarea id="loan-purpose" rows="2" required placeholder="Specify family/medical/emergency purpose" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none"></textarea>
-          </div>
-
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-[11px] space-y-1 text-slate-500">
-            <p>• Estimated Monthly EMI: <strong id="calculated-emi" class="text-teal-600 font-mono">₹0</strong></p>
-            <p>• Interest Fee: <strong class="text-emerald-600 font-mono">₹0 (Zero Interest)</strong></p>
-          </div>
-
-          <button type="submit" id="btn-submit-loan" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition">
-            Submit Loan Application
-          </button>
-        </form>
+    <!-- 3. PASSBOOK / TRANSACTIONS HISTORY -->
+    <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500">Passbook Ledger</h3>
+        <span class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">Automatic Record</span>
       </div>
-    </section>
 
-    <!-- 4. TAB: RECOVERY -->
-    <section id="tab-content-recovery" class="hidden space-y-3">
-      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Loan Recovery & EMI Ledger</h2>
-      <div id="recovery-container" class="space-y-3">
-        <p class="text-xs text-slate-400 text-center py-8">Checking recovery details...</p>
+      <div id="transactions-list" class="space-y-2.5">
+        <p class="text-xs text-slate-400 text-center py-6">Loading transaction records...</p>
       </div>
     </section>
 
   </main>
 
-  <!-- BOTTOM FIXED NAVIGATION BAR (4 TABS) -->
-  <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-800 flex justify-around items-center py-2 z-40">
-    <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center text-teal-600 dark:text-teal-400 transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-      </svg>
-      <span class="text-[10px] font-bold mt-0.5">Home</span>
-    </button>
+  <!-- LEFT DRAWER OVERLAY -->
+  <div id="drawer-overlay" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 transition-opacity"></div>
 
-    <button onclick="switchTab('deposit')" id="nav-btn-deposit" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-      </svg>
-      <span class="text-[10px] font-bold mt-0.5">Deposit</span>
-    </button>
+  <!-- LEFT DRAWER MENU -->
+  <aside id="drawer-menu" class="fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <!-- Header -->
+    <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-teal-700 dark:text-teal-400 text-base">Rehnuma Society</h3>
+        <p class="text-[11px] text-slate-400">Welfare & Trust Association</p>
+      </div>
+      <button id="btn-close-drawer" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
 
-    <button onclick="switchTab('loan')" id="nav-btn-loan" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-      </svg>
-      <span class="text-[10px] font-bold mt-0.5">Loan Form</span>
-    </button>
+    <!-- Links & Preferences -->
+    <div class="p-4 space-y-3 flex-1 overflow-y-auto">
+      
+      <!-- DARK / LIGHT MODE TOGGLE SWITCHER -->
+      <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="p-2 rounded-xl bg-white dark:bg-slate-700 text-slate-700 dark:text-amber-400 shadow-sm">
+            <svg id="theme-icon-sun" class="hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-slate-800 dark:text-slate-200">App Theme</p>
+            <p id="theme-status-text" class="text-[10px] text-slate-400">Dark Mode</p>
+          </div>
+        </div>
 
-    <button onclick="switchTab('recovery')" id="nav-btn-recovery" class="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-      </svg>
-      <span class="text-[10px] font-bold mt-0.5">Recovery</span>
-    </button>
-  </nav>
+        <!-- Switch Trigger -->
+        <button id="theme-toggle-btn" class="relative inline-flex h-6 w-11 items-center rounded-full bg-teal-600 transition-colors focus:outline-none">
+          <span id="theme-toggle-knob" class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+        </button>
+      </div>
 
+      <!-- Nav Items -->
+      <button onclick="triggerQuickDeposit(); closeDrawer();" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs transition">
+        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <span>Pay ₹1,000 Installment</span>
+      </button>
+
+      <button onclick="openLoanModal(); closeDrawer();" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs transition">
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span>Apply for Loan</span>
+      </button>
+    </div>
+
+    <!-- Drawer Footer: Sign Out -->
+    <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+      <button onclick="triggerSignOutAction()" class="w-full flex items-center justify-center space-x-2 px-3 py-3 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MODAL: LOAN APPLICATION -->
+  <div id="modal-loan" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="font-bold text-base text-teal-700 dark:text-teal-400">Micro-Loan Request</h3>
+          <p class="text-[10px] text-slate-400">Strictly 0% Interest Financial Aid</p>
+        </div>
+        <button onclick="closeLoanModal()" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="form-loan-app" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Requested Amount (₹)</label>
+          <input type="number" id="loan-amount" min="1000" step="500" required placeholder="e.g. 10000" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Repayment Period (Months)</label>
+          <input type="number" id="loan-tenure" min="1" max="24" required placeholder="e.g. 6" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">Reason / Purpose</label>
+          <textarea id="loan-reason" rows="2" required placeholder="Reason for micro-loan assistance" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm focus:ring-2 focus:ring-teal-600 focus:outline-none"></textarea>
+        </div>
+
+        <button type="submit" id="btn-submit-loan" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition">
+          Submit Loan Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- NATIVE CONFIRM / ACTION MODAL -->
+  <div id="native-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl">
+      <div class="space-y-1 text-center sm:text-left">
+        <h4 id="confirm-title" class="font-bold text-base text-slate-900 dark:text-slate-100">Confirm Action</h4>
+        <p id="confirm-desc" class="text-xs text-slate-500 leading-relaxed">Are you sure you want to proceed?</p>
+      </div>
+      <div class="flex space-x-2 pt-2">
+        <button id="btn-confirm-cancel" class="flex-1 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+          Cancel
+        </button>
+        <button id="btn-confirm-proceed" class="flex-1 py-2.5 rounded-xl text-white text-xs font-bold bg-teal-600 hover:bg-teal-700 transition">
+          Proceed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NATIVE FLOATING TOAST NOTIFICATION -->
+  <div id="native-toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center space-x-2 transition-all duration-300">
+    <span id="toast-icon">✓</span>
+    <span id="toast-text">Success message</span>
+  </div>
+
+  <!-- SCRIPT ENGINE -->
   <script type="module">
     import { auth, db, rtdb } from "../firebase-config.js";
     import { 
       doc, 
       getDoc, 
+      setDoc, 
       collection, 
-      getDocs, 
       addDoc, 
+      getDocs, 
       query, 
+      where, 
       orderBy, 
       serverTimestamp 
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-    import { ref, set, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+    import { 
+      ref, 
+      get, 
+      set, 
+      serverTimestamp as rtdbTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
-    let currentMember = null;
-    let currentUid = null;
+    let activeMemberUid = null;
+    let memberProfile = null;
 
-    // 1. Auth Guard & Identity Binding
-    auth.onAuthStateChanged(async (user) => {
+    // --- 1. ZERO-FLASH SESSION GUARD ---
+    async function verifyMemberSession(user) {
       if (!user) {
-        window.location.href = "/";
+        window.location.replace("../index.html");
         return;
       }
 
-      currentUid = user.uid;
-      const docSnap = await getDoc(doc(db, "users", currentUid));
-
-      if (!docSnap.exists() || docSnap.data().membershipStatus !== "active") {
-        alert("Access Denied: Account is not in active standing.");
-        window.location.href = "/";
-        return;
-      }
-
-      currentMember = docSnap.data();
-
-      // Set Header Profile Details
-      document.getElementById("member-name-header").textContent = currentMember.name || "Member";
-      document.getElementById("member-id-badge").textContent = `MID: ${currentMember.username || 'M-PENDING'}`;
-
-      if (currentMember.avatarBase64) {
-        const img = document.getElementById("member-avatar-img");
-        img.src = currentMember.avatarBase64;
-        img.classList.remove("hidden");
-        document.getElementById("member-avatar-fallback").classList.add("hidden");
-      }
-
-      loadDepositsLedger();
-      loadRecoveryLedger();
-    });
-
-    // 2. Tab Navigation Logic
-    window.switchTab = (tabName) => {
-      const tabs = ["home", "deposit", "loan", "recovery"];
-      tabs.forEach(t => {
-        const section = document.getElementById(`tab-content-${t}`);
-        const navBtn = document.getElementById(`nav-btn-${t}`);
-        const isActive = t === tabName;
-
-        section.classList.toggle("hidden", !isActive);
-        navBtn.className = isActive 
-          ? "flex flex-col items-center text-teal-600 dark:text-teal-400 transition-colors"
-          : "flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors";
-      });
-    };
-
-    // 3. Deposit Action Button (Monthly installment ₹1000)
-    document.getElementById("btn-pay-installment").addEventListener("click", async () => {
-      if (!confirm("Confirm monthly installment payment submission of ₹1,000?")) return;
-
-      const btn = document.getElementById("btn-pay-installment");
-      const alertBox = document.getElementById("deposit-alert");
-      btn.disabled = true;
-
       try {
-        const now = new Date();
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const currentMonthString = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
-
-        // Fetch previous cumulative total
-        const depositsQuery = query(collection(db, "users", currentUid, "deposits"), orderBy("createdAt", "desc"));
-        const existingDocs = await getDocs(depositsQuery);
-        let previousTotal = 0;
-        if (!existingDocs.empty) {
-          previousTotal = existingDocs.docs[0].data().cumulativeTotal || 0;
-        }
-
-        const newCumulative = previousTotal + 1000;
-
-        await addDoc(collection(db, "users", currentUid, "deposits"), {
-          month: currentMonthString,
-          installment: 1000,
-          cumulativeTotal: newCumulative,
-          createdAt: serverTimestamp()
-        });
-
-        alertBox.className = "mt-3 p-3 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
-        alertBox.textContent = `₹1,000 Installment recorded for ${currentMonthString}. Total Deposit: ₹${newCumulative}`;
-        alertBox.classList.remove("hidden");
-
-        loadDepositsLedger();
-      } catch (err) {
-        alertBox.className = "mt-3 p-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300";
-        alertBox.textContent = "Transaction failed: " + err.message;
-        alertBox.classList.remove("hidden");
-      } finally {
-        btn.disabled = false;
-      }
-    });
-
-    // 4. Load Deposits Ledger (Table: Month, Installment, Deposit)
-    async function loadDepositsLedger() {
-      const tbody = document.getElementById("deposit-table-rows");
-      try {
-        const q = query(collection(db, "users", currentUid, "deposits"), orderBy("createdAt", "asc"));
-        const snap = await getDocs(q);
-
-        if (snap.empty) {
-          tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400 font-sans text-xs">No deposit records recorded yet.</td></tr>`;
-          document.getElementById("home-total-deposited").textContent = "₹0";
-          document.getElementById("deposit-summary-total").textContent = "Total: ₹0";
+        // Step A: Check Active Member in Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (!userDoc.exists() || userDoc.data().membershipStatus !== "active") {
+          await auth.signOut();
+          window.location.replace("../index.html");
           return;
         }
 
-        tbody.innerHTML = "";
-        let finalCumulative = 0;
+        // Step B: Match session token in RTDB
+        const localToken = sessionStorage.getItem("activeSessionToken");
+        if (!localToken) {
+          await auth.signOut();
+          window.location.replace("../index.html");
+          return;
+        }
 
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
-          finalCumulative = d.cumulativeTotal;
-          const tr = document.createElement("tr");
-          tr.className = "hover:bg-slate-50/50 dark:hover:bg-slate-800/30";
-          tr.innerHTML = `
-            <td class="p-3 font-medium text-slate-700 dark:text-slate-200">${d.month}</td>
-            <td class="p-3 text-right text-slate-500">₹${d.installment}</td>
-            <td class="p-3 text-right font-bold text-teal-600">₹${d.cumulativeTotal}</td>
-          `;
-          tbody.appendChild(tr);
-        });
+        const sessionSnap = await get(ref(rtdb, `presence/${user.uid}/sessionToken`));
+        if (!sessionSnap.exists() || sessionSnap.val() !== localToken) {
+          await auth.signOut();
+          window.location.replace("../index.html");
+          return;
+        }
 
-        document.getElementById("home-total-deposited").textContent = `₹${finalCumulative}`;
-        document.getElementById("deposit-summary-total").textContent = `Total: ₹${finalCumulative}`;
+        // Verification Complete: Bind details and reveal UI
+        activeMemberUid = user.uid;
+        memberProfile = userDoc.data();
+        renderMemberProfile(memberProfile);
+
+        document.getElementById("app-body").style.display = "flex";
+        loadMemberLedgers();
+
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-rose-500 font-sans text-xs">Failed to load ledger: ${err.message}</td></tr>`;
+        console.error("Member session guard failure:", err);
+        window.location.replace("../index.html");
       }
     }
 
-    // 5. Loan Application & Live EMI Calculation
-    const loanAmtInput = document.getElementById("loan-amount");
-    const tenureInput = document.getElementById("loan-tenure");
+    auth.onAuthStateChanged(verifyMemberSession);
 
-    function updateLiveEmi() {
-      const principal = Number(loanAmtInput.value) || 0;
-      const tenure = Number(tenureInput.value) || 1;
-      const emi = Math.ceil(principal / tenure);
-      document.getElementById("calculated-emi").textContent = `₹${emi}/month`;
+    // --- 2. RENDER PROFILE UI ---
+    function renderMemberProfile(data) {
+      document.getElementById("member-name").textContent = data.name || "Member";
+      document.getElementById("member-mid").textContent = `MID: ${data.username || 'REH-MEMBER'}`;
+      document.getElementById("member-phone").textContent = `Phone: ${data.phone || 'N/A'}`;
+
+      if (data.avatarBase64) {
+        const avatarImg = document.getElementById("member-avatar");
+        avatarImg.src = data.avatarBase64;
+        avatarImg.classList.remove("hidden");
+        document.getElementById("member-initial").classList.add("hidden");
+      } else {
+        document.getElementById("member-initial").textContent = (data.name || 'M')[0].toUpperCase();
+      }
     }
 
-    loanAmtInput.addEventListener("input", updateLiveEmi);
-    tenureInput.addEventListener("input", updateLiveEmi);
+    // --- 3. NATIVE IN-APP CONFIRMATION & TOAST ---
+    function askNativeConfirm(title, desc, confirmButtonText, isDestructive = false) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById("native-confirm-modal");
+        const titleEl = document.getElementById("confirm-title");
+        const descEl = document.getElementById("confirm-desc");
+        const proceedBtn = document.getElementById("btn-confirm-proceed");
+        const cancelBtn = document.getElementById("btn-confirm-cancel");
 
-    document.getElementById("form-loan-apply").addEventListener("submit", async (e) => {
+        titleEl.textContent = title;
+        descEl.textContent = desc;
+        proceedBtn.textContent = confirmButtonText;
+
+        proceedBtn.className = isDestructive
+          ? "flex-1 py-2.5 rounded-xl text-white text-xs font-bold bg-rose-600 hover:bg-rose-700 transition"
+          : "flex-1 py-2.5 rounded-xl text-white text-xs font-bold bg-teal-600 hover:bg-teal-700 transition";
+
+        modal.classList.remove("hidden");
+
+        const handleProceed = () => {
+          modal.classList.add("hidden");
+          cleanup();
+          resolve(true);
+        };
+
+        const handleCancel = () => {
+          modal.classList.add("hidden");
+          cleanup();
+          resolve(false);
+        };
+
+        function cleanup() {
+          proceedBtn.removeEventListener("click", handleProceed);
+          cancelBtn.removeEventListener("click", handleCancel);
+        }
+
+        proceedBtn.addEventListener("click", handleProceed);
+        cancelBtn.addEventListener("click", handleCancel);
+      });
+    }
+
+    window.showToast = (msg, isError = false) => {
+      const toast = document.getElementById("native-toast");
+      const icon = document.getElementById("toast-icon");
+      const text = document.getElementById("toast-text");
+
+      text.textContent = msg;
+      icon.textContent = isError ? "✕" : "✓";
+      toast.className = isError
+        ? "fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center space-x-2 bg-rose-600 text-white transition-all duration-300"
+        : "fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center space-x-2 bg-teal-700 text-white transition-all duration-300";
+
+      toast.classList.remove("hidden");
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 3000);
+    };
+
+    // --- 4. THEME TOGGLE SWITCHER ENGINE ---
+    const themeToggleBtn = document.getElementById("theme-toggle-btn");
+    const themeKnob = document.getElementById("theme-toggle-knob");
+    const sunIcon = document.getElementById("theme-icon-sun");
+    const moonIcon = document.getElementById("theme-icon-moon");
+    const themeStatusText = document.getElementById("theme-status-text");
+
+    function syncThemeUI(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        themeKnob.className = "inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6";
+        themeToggleBtn.className = "relative inline-flex h-6 w-11 items-center rounded-full bg-teal-600 transition-colors focus:outline-none";
+        sunIcon.classList.add("hidden");
+        moonIcon.classList.remove("hidden");
+        themeStatusText.textContent = "Dark Mode";
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove('dark');
+        themeKnob.className = "inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1";
+        themeToggleBtn.className = "relative inline-flex h-6 w-11 items-center rounded-full bg-slate-300 transition-colors focus:outline-none";
+        sunIcon.classList.remove("hidden");
+        moonIcon.classList.add("hidden");
+        themeStatusText.textContent = "Light Mode";
+        localStorage.setItem("theme", "light");
+      }
+    }
+
+    // Initial Theme Sync
+    syncThemeUI(localStorage.getItem('theme') !== 'light');
+
+    themeToggleBtn.addEventListener("click", () => {
+      const isCurrentlyDark = document.documentElement.classList.contains("dark");
+      syncThemeUI(!isCurrentlyDark);
+    });
+
+    // --- 5. DRAWER CONTROLS ---
+    const drawerOverlay = document.getElementById("drawer-overlay");
+    const drawerMenu = document.getElementById("drawer-menu");
+
+    window.openDrawer = () => {
+      drawerOverlay.classList.remove("hidden");
+      drawerMenu.classList.remove("-translate-x-full");
+    };
+
+    window.closeDrawer = () => {
+      drawerOverlay.classList.add("hidden");
+      drawerMenu.classList.add("-translate-x-full");
+    };
+
+    document.getElementById("btn-open-drawer").addEventListener("click", openDrawer);
+    document.getElementById("btn-close-drawer").addEventListener("click", closeDrawer);
+    drawerOverlay.addEventListener("click", closeDrawer);
+
+    // --- 6. TRANSACTIONS & LEDGERS ---
+    async function loadMemberLedgers() {
+      const listContainer = document.getElementById("transactions-list");
+      try {
+        const q = query(
+          collection(db, "deposits"),
+          where("memberUid", "==", activeMemberUid)
+        );
+        const snap = await getDocs(q);
+
+        let totalDeposited = 0;
+        const deposits = [];
+
+        snap.forEach(d => {
+          const item = d.data();
+          totalDeposited += (Number(item.amount) || 0);
+          deposits.push(item);
+        });
+
+        document.getElementById("total-deposit-amt").textContent = `₹${totalDeposited.toLocaleString('en-IN')}`;
+
+        // Check Loans
+        const loanSnap = await getDocs(query(collection(db, "loans"), where("memberUid", "==", activeMemberUid)));
+        let loanDue = 0;
+        loanSnap.forEach(ld => {
+          loanDue += (Number(ld.data().remainingBalance) || 0);
+        });
+        document.getElementById("total-loan-due").textContent = `₹${loanDue.toLocaleString('en-IN')}`;
+
+        if (deposits.length === 0) {
+          listContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">No deposit transactions found yet.</p>`;
+          return;
+        }
+
+        // Sort locally
+        deposits.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+        listContainer.innerHTML = "";
+        deposits.forEach(dep => {
+          const card = document.createElement("div");
+          card.className = "flex justify-between items-center p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 text-xs";
+          const dateStr = dep.timestamp ? new Date(dep.timestamp.seconds * 1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent';
+          card.innerHTML = `
+            <div>
+              <p class="font-bold text-slate-800 dark:text-slate-200">${dep.type || 'Monthly Installment'}</p>
+              <p class="text-[10px] text-slate-400 font-mono">${dateStr}</p>
+            </div>
+            <span class="font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">+₹${dep.amount}</span>
+          `;
+          listContainer.appendChild(card);
+        });
+
+      } catch (err) {
+        listContainer.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Error loading ledger: ${err.message}</p>`;
+      }
+    }
+
+    // --- 7. QUICK ₹1,000 DEPOSIT ACTION ---
+    window.triggerQuickDeposit = async () => {
+      const confirmed = await askNativeConfirm(
+        "Deposit Installment",
+        "Confirm payment of your ₹1,000 monthly welfare contribution?",
+        "Pay ₹1,000 Now"
+      );
+      if (!confirmed) return;
+
+      try {
+        await addDoc(collection(db, "deposits"), {
+          memberUid: activeMemberUid,
+          memberName: memberProfile.name || "Member",
+          memberUsername: memberProfile.username || "N/A",
+          amount: 1000,
+          type: "Monthly Installment",
+          timestamp: serverTimestamp()
+        });
+
+        showToast("₹1,000 installment deposited successfully!");
+        loadMemberLedgers();
+      } catch (err) {
+        showToast("Transaction failed: " + err.message, true);
+      }
+    };
+
+    // --- 8. LOAN APPLICATION MODAL ---
+    window.openLoanModal = () => {
+      document.getElementById("modal-loan").classList.remove("hidden");
+    };
+    window.closeLoanModal = () => {
+      document.getElementById("modal-loan").classList.add("hidden");
+      document.getElementById("form-loan-app").reset();
+    };
+
+    document.getElementById("form-loan-app").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const alertBox = document.getElementById("loan-alert");
+      const amount = Number(document.getElementById("loan-amount").value);
+      const tenure = Number(document.getElementById("loan-tenure").value);
+      const reason = document.getElementById("loan-reason").value.trim();
       const btn = document.getElementById("btn-submit-loan");
 
-      const principal = Number(loanAmtInput.value);
-      const tenure = Number(tenureInput.value);
-      const purpose = document.getElementById("loan-purpose").value.trim();
-      const emi = Math.ceil(principal / tenure);
-
       btn.disabled = true;
+      btn.textContent = "Submitting Application...";
 
       try {
         await addDoc(collection(db, "loans"), {
-          uid: currentUid,
-          memberName: currentMember.name,
-          username: currentMember.username,
-          principalAmount: principal,
+          memberUid: activeMemberUid,
+          memberName: memberProfile.name || "Member",
+          principalAmount: amount,
+          remainingBalance: amount,
           tenureMonths: tenure,
-          monthlyEmi: emi,
-          purpose: purpose,
-          status: "pending_review",
-          remainingBalance: principal,
-          paidEmis: 0,
+          monthlyEmi: Math.round(amount / tenure),
+          purpose: reason,
+          status: "active",
           createdAt: serverTimestamp()
         });
 
-        alertBox.className = "p-3 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
-        alertBox.textContent = "Loan application submitted for administrator sanction.";
-        alertBox.classList.remove("hidden");
-        document.getElementById("form-loan-apply").reset();
-        document.getElementById("calculated-emi").textContent = "₹0";
+        showToast("Loan application recorded successfully!");
+        closeLoanModal();
+        loadMemberLedgers();
       } catch (err) {
-        alertBox.className = "p-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300";
-        alertBox.textContent = "Error submitting application: " + err.message;
-        alertBox.classList.remove("hidden");
+        showToast("Application error: " + err.message, true);
       } finally {
         btn.disabled = false;
+        btn.textContent = "Submit Loan Request";
       }
     });
 
-    // 6. Load Recovery Ledger
-    async function loadRecoveryLedger() {
-      const container = document.getElementById("recovery-container");
+    // --- 9. BULLETPROOF SIGN OUT ACTION (WITH AUTO REDIRECT) ---
+    window.triggerSignOutAction = async () => {
+      const confirmed = await askNativeConfirm(
+        "Sign Out",
+        "Are you sure you want to sign out from your member account?",
+        "Sign Out",
+        true
+      );
+      if (!confirmed) return;
+
       try {
-        const q = query(collection(db, "loans"));
-        const snap = await getDocs(q);
-
-        const memberLoans = [];
-        snap.forEach(d => {
-          if (d.data().uid === currentUid && d.data().status === "sanctioned") {
-            memberLoans.push(d.data());
-          }
-        });
-
-        if (memberLoans.length === 0) {
-          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No active loans under recovery.</p>`;
-          document.getElementById("home-loan-status").textContent = "None";
-          return;
+        if (activeMemberUid) {
+          await set(ref(rtdb, `presence/${activeMemberUid}`), {
+            state: "offline",
+            sessionToken: null,
+            lastActive: rtdbTimestamp()
+          });
         }
-
-        container.innerHTML = "";
-        memberLoans.forEach(l => {
-          document.getElementById("home-loan-status").textContent = `₹${l.remainingBalance} Bal`;
-
-          const card = document.createElement("div");
-          card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm";
-          card.innerHTML = `
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
-              <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Interest-Free Micro Loan</span>
-              <span class="text-xs font-mono font-bold text-teal-600">₹${l.principalAmount}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                <span class="text-[10px] text-slate-400 block">Monthly EMI</span>
-                <span class="font-bold font-mono">₹${l.monthlyEmi}</span>
-              </div>
-              <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                <span class="text-[10px] text-slate-400 block">Tenure</span>
-                <span class="font-bold font-mono">${l.tenureMonths} Months</span>
-              </div>
-            </div>
-            <div class="flex justify-between items-center pt-1 text-xs">
-              <span class="text-slate-400">Remaining Balance:</span>
-              <span class="font-mono font-bold text-rose-600">₹${l.remainingBalance}</span>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Failed to fetch recovery data: ${err.message}</p>`;
+      } catch (dbErr) {
+        console.warn("Presence reset warning:", dbErr);
       }
-    }
 
-    // 7. Member Logout Handler
-    window.memberLogout = async () => {
-      if (currentUid) {
-        const presenceRef = ref(rtdb, `presence/${currentUid}`);
-        await set(presenceRef, { state: "offline", sessionToken: null, lastActive: rtdbTimestamp() });
+      try {
+        sessionStorage.removeItem("activeSessionToken");
+        await auth.signOut();
+      } catch (authErr) {
+        console.warn("Auth signout warning:", authErr);
+      } finally {
+        // Safe relative navigation to Root Login Page
+        window.location.replace("../index.html");
       }
-      await auth.signOut();
-      window.location.href = "/";
     };
   </script>
 </body>
