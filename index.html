@@ -1,69 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <style>
-  /* 3D Splash Container */
-  #splash-screen {
-    perspective: 1000px;
-    background: radial-gradient(circle at center, #064e3b 0%, #022c22 45%, #020617 100%);
-  }
-
-  /* 3D Emblem Transformation */
-  .logo-3d-wrapper {
-    transform-style: preserve-3d;
-    animation: popIn3D 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes popIn3D {
-    0% {
-      opacity: 0;
-      transform: scale(0.6) rotateX(25deg) translateY(40px);
-      filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0));
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) rotateX(0deg) translateY(0);
-      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 25px rgba(20, 184, 166, 0.35));
-    }
-  }
-
-  /* Metallic Golden Ring Sheen */
-  .gold-sheen-ring {
-    background: conic-gradient(from 180deg at 50% 50%, #d4af37 0deg, #fff2a1 90deg, #aa7c11 180deg, #fff2a1 270deg, #d4af37 360deg);
-    padding: 3px;
-    border-radius: 9999px;
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6), 0 10px 20px rgba(0,0,0,0.5);
-  }
-
-  /* Wipe Right In Animation for Subtitle */
-  .wipe-right-in {
-    clip-path: inset(0 100% 0 0);
-    animation: wipeRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  @keyframes wipeRight {
-    0% {
-      clip-path: inset(0 100% 0 0);
-      opacity: 0;
-      transform: translateX(-8px);
-    }
-    100% {
-      clip-path: inset(0 0 0 0);
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  </style>
-  
-  
-<link rel="icon" type="image/png" href="./icon.png" />
-<link rel="apple-touch-icon" href="./icon.png" />
-<link rel="manifest" href="./manifest.json" />
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rehnuma Society</title>
+  
+  <link rel="icon" type="image/png" href="./icon.png" />
+  <link rel="apple-touch-icon" href="./icon.png" />
+  <link rel="manifest" href="./manifest.json" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -71,28 +16,100 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              500: '#0F766E',
-              600: '#0D9488',
-              700: '#115E59'
-            }
+            brand: { 500: '#0F766E', 600: '#0D9488', 700: '#115E59' }
           }
         }
       }
     };
   </script>
+  
+  <style>
+    .crop-touch-area {
+      touch-action: none;
+    }
+
+    /* 3D Splash Screen & Animations */
+    #splash-screen {
+      perspective: 1000px;
+      background: radial-gradient(circle at center, #064e3b 0%, #022c22 45%, #020617 100%);
+    }
+
+    .logo-3d-wrapper {
+      transform-style: preserve-3d;
+      animation: popIn3D 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes popIn3D {
+      0% {
+        opacity: 0;
+        transform: scale(0.6) rotateX(25deg) translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotateX(0deg) translateY(0);
+        filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 25px rgba(20, 184, 166, 0.4));
+      }
+    }
+
+    .gold-sheen-ring {
+      background: conic-gradient(from 180deg at 50% 50%, #d4af37 0deg, #fff2a1 90deg, #aa7c11 180deg, #fff2a1 270deg, #d4af37 360deg);
+      padding: 3px;
+      border-radius: 9999px;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6), 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    .wipe-right-in {
+      clip-path: inset(0 100% 0 0);
+      animation: wipeRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes wipeRight {
+      0% {
+        clip-path: inset(0 100% 0 0);
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      100% {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col justify-center items-center p-4 antialiased select-none">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-center items-center p-4 antialiased select-none">
+
+  <!-- 1. 3D ANIMATED OPENING SPLASH SCREEN -->
+  <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+    <div class="logo-3d-wrapper relative mb-6">
+      <div class="gold-sheen-ring">
+        <div class="w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden bg-slate-950 flex items-center justify-center border border-teal-500/40 shadow-2xl">
+          <img src="./icon.png" alt="Rehnuma Society" class="w-full h-full object-cover scale-105" />
+        </div>
+      </div>
+      <div class="absolute -inset-2 rounded-full bg-teal-500/20 blur-xl -z-10 animate-pulse"></div>
+    </div>
+
+    <div class="text-center space-y-1">
+      <h1 id="splash-title" class="text-2xl md:text-3xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 uppercase font-serif min-h-[36px]"></h1>
+      <div id="splash-subtitle" class="hidden wipe-right-in">
+        <p class="text-xs uppercase tracking-[0.25em] font-semibold text-emerald-400 drop-shadow">
+          • Interest-Free •
+        </p>
+      </div>
+    </div>
+  </div>
 
   <!-- NATIVE FLOATING TOAST -->
   <div id="native-toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center space-x-2 transition-all duration-300">
     <span id="toast-icon">✓</span>
-    <span id="toast-text">Notification message</span>
+    <span id="toast-text">Notification</span>
   </div>
 
-  <main class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 transition-all">
+  <!-- MAIN APP CONTAINER -->
+  <main class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 transition-all">
 
-    <!-- 1. LOGIN INTERFACE -->
+    <!-- VIEW 1: SIGN IN INTERFACE -->
     <section id="view-login" class="space-y-6">
       <header class="text-center space-y-1">
         <h1 class="text-3xl font-extrabold text-teal-700 dark:text-teal-400 tracking-tight">Rehnuma Society</h1>
@@ -134,7 +151,7 @@
       </button>
     </section>
 
-    <!-- 2. REGISTRATION FLOW (loginCount == 0) -->
+    <!-- VIEW 2: REGISTRATION WIZARD -->
     <section id="view-registration" class="hidden space-y-5">
       <header class="border-b border-slate-200 dark:border-slate-800 pb-3">
         <h2 class="text-xl font-extrabold text-teal-700 dark:text-teal-400">Complete Membership Profile</h2>
@@ -142,16 +159,16 @@
       </header>
 
       <form id="form-registration" class="space-y-4">
-        <!-- Step 1: Personal Info -->
         <div id="reg-step-1" class="space-y-3">
           <div class="flex items-center space-x-4">
-            <div class="relative w-16 h-16 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 overflow-hidden flex items-center justify-center bg-slate-50 dark:bg-slate-800 flex-shrink-0">
+            <div class="relative w-16 h-16 rounded-full border-2 border-dashed border-teal-500 overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800 flex-shrink-0 shadow-inner">
               <img id="avatar-preview" class="hidden w-full h-full object-cover" />
-              <span id="avatar-placeholder" class="text-xs text-slate-400 text-center font-semibold">Photo</span>
+              <span id="avatar-placeholder" class="text-xs text-slate-400 text-center font-bold">Photo</span>
             </div>
             <div>
-              <label class="block text-xs font-bold uppercase text-slate-500">Profile Picture</label>
-              <input type="file" id="reg-avatar-input" accept="image/*" class="text-xs mt-1 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 dark:file:bg-teal-950 dark:file:text-teal-300 cursor-pointer" required />
+              <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Profile Picture</label>
+              <input type="file" id="reg-avatar-input" accept="image/*" class="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-teal-700 dark:file:bg-teal-950 dark:file:text-teal-300 cursor-pointer" />
+              <p class="text-[10px] text-slate-400 mt-0.5">Select image to crop & adjust</p>
             </div>
           </div>
 
@@ -177,16 +194,15 @@
           </div>
         </div>
 
-        <!-- Step 2: KYC Numbers -->
         <div id="reg-step-2" class="hidden space-y-3">
           <div>
             <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Aadhaar Card Number</label>
-            <input type="text" id="reg-aadhar" maxlength="12" pattern="\d{12}" placeholder="12-digit UIDAI number" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono tracking-widest focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+            <input type="text" id="reg-aadhar" maxlength="12" pattern="\d{12}" placeholder="12-digit number" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm font-mono tracking-widest focus:ring-2 focus:ring-teal-600 focus:outline-none" />
           </div>
 
           <div>
             <label class="block text-xs font-bold uppercase text-slate-500 mb-1">PAN Card Number</label>
-            <input type="text" id="reg-pan" maxlength="10" placeholder="10-character alphanumeric PAN" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm uppercase font-mono tracking-widest focus:ring-2 focus:ring-teal-600 focus:outline-none" />
+            <input type="text" id="reg-pan" maxlength="10" placeholder="10-character PAN" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent text-sm uppercase font-mono tracking-widest focus:ring-2 focus:ring-teal-600 focus:outline-none" />
           </div>
 
           <div>
@@ -195,7 +211,6 @@
           </div>
         </div>
 
-        <!-- Step 3: Terms Agreement -->
         <div id="reg-step-3" class="hidden space-y-4">
           <div class="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs space-y-2 leading-relaxed">
             <p class="font-bold text-teal-700 dark:text-teal-400">Society Constitution Agreement:</p>
@@ -220,7 +235,7 @@
       </form>
     </section>
 
-    <!-- 3. STATUS SCREEN: APPLICATION SUBMITTED -->
+    <!-- VIEW 3: APPLICATION SUBMITTED -->
     <section id="view-status-submitted" class="hidden text-center space-y-4 py-4">
       <div class="w-16 h-16 mx-auto rounded-full bg-teal-50 dark:bg-teal-950/80 text-teal-600 flex items-center justify-center">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,7 +249,7 @@
       <button onclick="portalLogout()" class="px-5 py-2.5 border border-slate-300 dark:border-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition">Sign Out</button>
     </section>
 
-    <!-- 4. STATUS SCREEN: DENIED BY ADMIN -->
+    <!-- VIEW 4: DENIED STATUS -->
     <section id="view-status-denied" class="hidden text-center space-y-4 py-4">
       <div class="w-16 h-16 mx-auto rounded-full bg-rose-50 dark:bg-rose-950/80 text-rose-600 flex items-center justify-center">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,6 +265,42 @@
 
   </main>
 
+  <!-- INTERACTIVE PROFILE CROPPER MODAL -->
+  <div id="modal-cropper" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl flex flex-col items-center">
+      <div class="w-full flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="font-extrabold text-sm text-teal-700 dark:text-teal-400">Crop Profile Picture</h3>
+          <p class="text-[10px] text-slate-400">Drag to center • Adjust zoom below</p>
+        </div>
+        <button id="btn-crop-cancel" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="relative w-64 h-64 rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center border border-slate-800 shadow-inner crop-touch-area">
+        <canvas id="cropper-canvas" width="256" height="256" class="cursor-grab active:cursor-grabbing"></canvas>
+        <div class="pointer-events-none absolute inset-0 rounded-full border-2 border-teal-500/80 shadow-[0_0_0_9999px_rgba(2,6,23,0.65)]"></div>
+      </div>
+
+      <div class="w-full px-2 space-y-1">
+        <div class="flex justify-between text-[11px] font-bold text-slate-400">
+          <span>Zoom</span>
+          <span id="zoom-label">1.0x</span>
+        </div>
+        <input type="range" id="crop-zoom-slider" min="1" max="3" step="0.05" value="1" class="w-full accent-teal-600 cursor-pointer h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none" />
+      </div>
+
+      <div class="w-full flex space-x-2 pt-2">
+        <button id="btn-crop-dismiss" class="flex-1 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Cancel</button>
+        <button id="btn-crop-apply" class="flex-1 py-2.5 rounded-xl text-white text-xs font-bold bg-teal-600 hover:bg-teal-700 transition shadow-md">Crop & Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT ENGINE -->
   <script type="module">
     import { auth, db, rtdb } from "./firebase-config.js";
     import { 
@@ -276,7 +327,38 @@
     let activeStep = 1;
     let compressedAvatarBase64 = "";
 
-    // Native Toast Function
+    // 1. SPLASH SCREEN SEQUENCE
+    const splashScreen = document.getElementById("splash-screen");
+    const splashTitle = document.getElementById("splash-title");
+    const splashSubtitle = document.getElementById("splash-subtitle");
+    const targetSplashText = "REHNUMA SOCIETY";
+    let splashCharIdx = 0;
+
+    function runSplashAnimation() {
+      setTimeout(() => {
+        const typeInterval = setInterval(() => {
+          if (splashCharIdx < targetSplashText.length) {
+            splashTitle.textContent += targetSplashText.charAt(splashCharIdx);
+            splashCharIdx++;
+          } else {
+            clearInterval(typeInterval);
+            splashSubtitle.classList.remove("hidden");
+          }
+        }, 55);
+      }, 350);
+    }
+    runSplashAnimation();
+
+    function dismissSplash() {
+      if (splashScreen) {
+        splashScreen.classList.add("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          splashScreen.style.display = "none";
+        }, 500);
+      }
+    }
+
+    // 2. NATIVE TOAST HELPER
     window.showToast = (msg, isError = false) => {
       const toast = document.getElementById("native-toast");
       const icon = document.getElementById("toast-icon");
@@ -293,6 +375,19 @@
         toast.classList.add("hidden");
       }, 3000);
     };
+
+    function setView(viewId) {
+      ["view-login", "view-registration", "view-status-submitted", "view-status-denied"].forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+      document.getElementById(viewId).classList.remove("hidden");
+    }
+
+    function showLoginError(msg) {
+      const errBox = document.getElementById("login-error-alert");
+      errBox.textContent = msg;
+      errBox.classList.remove("hidden");
+    }
 
     function generateSessionToken() {
       return 'sess_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
@@ -335,28 +430,17 @@
       sessionStorage.setItem("activeSessionToken", sessionToken);
     }
 
-    function setView(viewId) {
-      ["view-login", "view-registration", "view-status-submitted", "view-status-denied"].forEach(id => {
-        document.getElementById(id).classList.add("hidden");
-      });
-      document.getElementById(viewId).classList.remove("hidden");
-    }
-
-    function showLoginError(msg) {
-      const errBox = document.getElementById("login-error-alert");
-      errBox.textContent = msg;
-      errBox.classList.remove("hidden");
-    }
-
-    // Gatekeeper & Routing Logic
+    // 3. AUTH & ROUTING GATEKEEPER
     async function evaluateRouting(user) {
       if (!user) {
-        setView("view-login");
+        setTimeout(() => {
+          dismissSplash();
+          setView("view-login");
+        }, 1600);
         return;
       }
 
       try {
-        // Admin Evaluation
         const adminDoc = await getDoc(doc(db, "admins", user.uid));
         if (adminDoc.exists()) {
           await bindUserSession(user);
@@ -364,29 +448,28 @@
           return;
         }
 
-        // Member Evaluation
         const memberDoc = await getDoc(doc(db, "users", user.uid));
         if (!memberDoc.exists()) {
           await signOut(auth);
-          showLoginError("Access Denied: This account is not registered. Please contact the administrator.");
+          dismissSplash();
+          showLoginError("Access Denied: Account not registered.");
           setView("view-login");
           return;
         }
 
         const member = memberDoc.data();
-
-        // Check if denied
         if (member.membershipStatus === "denied") {
+          dismissSplash();
           setView("view-status-denied");
           return;
         }
 
         await bindUserSession(user);
 
-        // Check first login
         if (member.loginCount === 0) {
           document.getElementById("reg-name").value = member.name || "";
           document.getElementById("reg-phone").value = member.phone || "";
+          dismissSplash();
           setView("view-registration");
           return;
         }
@@ -394,16 +477,18 @@
         if (member.membershipStatus === "active") {
           window.location.replace("./User/member.html");
         } else {
+          dismissSplash();
           setView("view-status-submitted");
         }
       } catch (err) {
-        showLoginError("System verification error: " + err.message);
+        dismissSplash();
+        showLoginError("Verification error: " + err.message);
       }
     }
 
     onAuthStateChanged(auth, evaluateRouting);
 
-    // Email/Password Login
+    // 4. LOGIN FORM HANDLERS
     document.getElementById("form-login").addEventListener("submit", async (e) => {
       e.preventDefault();
       document.getElementById("login-error-alert").classList.add("hidden");
@@ -413,11 +498,10 @@
       try {
         await signInWithEmailAndPassword(auth, email, pass);
       } catch (err) {
-        showLoginError(err.message || "Failed to authenticate.");
+        showLoginError(err.message || "Authentication failed.");
       }
     });
 
-    // Google Sign-in
     document.getElementById("btn-google-login").addEventListener("click", async () => {
       document.getElementById("login-error-alert").classList.add("hidden");
       try {
@@ -428,7 +512,6 @@
       }
     });
 
-    // Sign Out
     window.portalLogout = async () => {
       if (auth.currentUser) {
         const presenceRef = ref(rtdb, `presence/${auth.currentUser.uid}`);
@@ -439,7 +522,37 @@
       setView("view-login");
     };
 
-    // Canvas Image Compression
+    // 5. INTERACTIVE PROFILE CROPPER
+    const cropperCanvas = document.getElementById("cropper-canvas");
+    const cropperCtx = cropperCanvas.getContext("2d");
+    const zoomSlider = document.getElementById("crop-zoom-slider");
+    const zoomLabel = document.getElementById("zoom-label");
+    const cropperModal = document.getElementById("modal-cropper");
+
+    let loadedRawImage = null;
+    let cropScale = 1;
+    let baseCoverScale = 1;
+    let cropOffsetX = 0;
+    let cropOffsetY = 0;
+    let isDragging = false;
+    let startPointerX = 0;
+    let startPointerY = 0;
+
+    function renderCropperView() {
+      if (!loadedRawImage) return;
+      const size = cropperCanvas.width;
+      cropperCtx.clearRect(0, 0, size, size);
+
+      const currentScale = baseCoverScale * cropScale;
+      const drawnW = loadedRawImage.width * currentScale;
+      const drawnH = loadedRawImage.height * currentScale;
+
+      const centerX = (size - drawnW) / 2 + cropOffsetX;
+      const centerY = (size - drawnH) / 2 + cropOffsetY;
+
+      cropperCtx.drawImage(loadedRawImage, centerX, centerY, drawnW, drawnH);
+    }
+
     document.getElementById("reg-avatar-input").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -448,28 +561,95 @@
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = 200;
-          canvas.height = 200;
-          const ctx = canvas.getContext("2d");
+          loadedRawImage = img;
+          const size = cropperCanvas.width;
+          baseCoverScale = Math.max(size / img.width, size / img.height);
+          cropScale = 1;
+          cropOffsetX = 0;
+          cropOffsetY = 0;
+          zoomSlider.value = 1;
+          zoomLabel.textContent = "1.0x";
 
-          const minDim = Math.min(img.width, img.height);
-          const startX = (img.width - minDim) / 2;
-          const startY = (img.height - minDim) / 2;
-          ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, 200, 200);
-
-          compressedAvatarBase64 = canvas.toDataURL("image/jpeg", 0.75);
-          const preview = document.getElementById("avatar-preview");
-          preview.src = compressedAvatarBase64;
-          preview.classList.remove("hidden");
-          document.getElementById("avatar-placeholder").classList.add("hidden");
+          renderCropperView();
+          cropperModal.classList.remove("hidden");
         };
         img.src = event.target.result;
       };
       reader.readAsDataURL(file);
+      e.target.value = "";
     });
 
-    // Registration Steps
+    zoomSlider.addEventListener("input", (e) => {
+      cropScale = parseFloat(e.target.value);
+      zoomLabel.textContent = `${cropScale.toFixed(1)}x`;
+      renderCropperView();
+    });
+
+    function handlePointerStart(x, y) {
+      isDragging = true;
+      startPointerX = x - cropOffsetX;
+      startPointerY = y - cropOffsetY;
+    }
+    function handlePointerMove(x, y) {
+      if (!isDragging) return;
+      cropOffsetX = x - startPointerX;
+      cropOffsetY = y - startPointerY;
+      renderCropperView();
+    }
+    function handlePointerEnd() {
+      isDragging = false;
+    }
+
+    cropperCanvas.addEventListener("mousedown", (e) => handlePointerStart(e.clientX, e.clientY));
+    window.addEventListener("mousemove", (e) => handlePointerMove(e.clientX, e.clientY));
+    window.addEventListener("mouseup", handlePointerEnd);
+
+    cropperCanvas.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1) handlePointerStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    window.addEventListener("touchmove", (e) => {
+      if (isDragging && e.touches.length === 1) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    window.addEventListener("touchend", handlePointerEnd);
+
+    const closeCropper = () => {
+      cropperModal.classList.add("hidden");
+      loadedRawImage = null;
+    };
+    document.getElementById("btn-crop-cancel").addEventListener("click", closeCropper);
+    document.getElementById("btn-crop-dismiss").addEventListener("click", closeCropper);
+
+    document.getElementById("btn-crop-apply").addEventListener("click", () => {
+      if (!loadedRawImage) return;
+
+      const exportCanvas = document.createElement("canvas");
+      exportCanvas.width = 200;
+      exportCanvas.height = 200;
+      const exportCtx = exportCanvas.getContext("2d");
+
+      const ratio = 200 / cropperCanvas.width;
+      const currentScale = baseCoverScale * cropScale * ratio;
+      const drawnW = loadedRawImage.width * currentScale;
+      const drawnH = loadedRawImage.height * currentScale;
+
+      const centerX = (200 - drawnW) / 2 + (cropOffsetX * ratio);
+      const centerY = (200 - drawnH) / 2 + (cropOffsetY * ratio);
+
+      exportCtx.drawImage(loadedRawImage, centerX, centerY, drawnW, drawnH);
+      compressedAvatarBase64 = exportCanvas.toDataURL("image/jpeg", 0.75);
+
+      const preview = document.getElementById("avatar-preview");
+      preview.src = compressedAvatarBase64;
+      preview.classList.remove("hidden");
+      document.getElementById("avatar-placeholder").classList.add("hidden");
+
+      closeCropper();
+      showToast("Profile photo updated successfully!");
+    });
+
+    // 6. REGISTRATION WIZARD LOGIC
     const updateWizard = () => {
       document.getElementById("reg-step-1").classList.toggle("hidden", activeStep !== 1);
       document.getElementById("reg-step-2").classList.toggle("hidden", activeStep !== 2);
@@ -489,7 +669,7 @@
 
     document.getElementById("btn-reg-next").addEventListener("click", () => {
       if (activeStep === 1 && !compressedAvatarBase64) {
-        showToast("Please select a profile photo.", true);
+        showToast("Please select and crop a profile photo.", true);
         return;
       }
       if (activeStep < 3) {
@@ -505,7 +685,6 @@
       }
     });
 
-    // Form Submission
     document.getElementById("form-registration").addEventListener("submit", async (e) => {
       e.preventDefault();
       const user = auth.currentUser;
@@ -532,98 +711,6 @@
         showToast("Submission error: " + err.message, true);
       }
     });
-
-    // --- SPLASH ENGINE & TEXT TYPER ---
-const splashScreen = document.getElementById("splash-screen");
-const splashTitle = document.getElementById("splash-title");
-const splashSubtitle = document.getElementById("splash-subtitle");
-
-const targetText = "REHNUMA SOCIETY";
-let charIndex = 0;
-
-function startSplashSequence() {
-  // 1. Logo ke aane ke baad 300ms baad typewriter start
-  setTimeout(() => {
-    const typeInterval = setInterval(() => {
-      if (charIndex < targetText.length) {
-        splashTitle.textContent += targetText.charAt(charIndex);
-        charIndex++;
-      } else {
-        clearInterval(typeInterval);
-        // 2. Title khatam hote hi "INTEREST-FREE" wipe-in hoga
-        splashSubtitle.classList.remove("hidden");
-      }
-    }, 60); // Speed of each letter
-  }, 400);
-}
-
-// Sequence start
-startSplashSequence();
-
-// --- CLEAN SEAMLESS DISMISS ---
-function dismissSplash() {
-  splashScreen.classList.add("opacity-0", "pointer-events-none");
-  setTimeout(() => {
-    splashScreen.style.display = "none";
-  }, 500);
-}
-
-// Firebase Auth Router me modify karein:
-async function evaluateRouting(user) {
-  if (!user) {
-    // Agar logged in nahi hai, to 1.8s animation poora dikhakar login view par laayein
-    setTimeout(() => {
-      dismissSplash();
-      setView("view-login");
-    }, 1800);
-    return;
-  }
-
-  try {
-    const adminDoc = await getDoc(doc(db, "admins", user.uid));
-    if (adminDoc.exists()) {
-      await bindUserSession(user);
-      // Agar admin hai, to bina login page dikhaye foran switch karein
-      window.location.replace("./User/admin.html");
-      return;
-    }
-
-    const memberDoc = await getDoc(doc(db, "users", user.uid));
-    if (!memberDoc.exists()) {
-      await signOut(auth);
-      dismissSplash();
-      showLoginError("Access Denied: Account not registered.");
-      setView("view-login");
-      return;
-    }
-
-    const member = memberDoc.data();
-    if (member.membershipStatus === "denied") {
-      dismissSplash();
-      setView("view-status-denied");
-      return;
-    }
-
-    await bindUserSession(user);
-
-    if (member.loginCount === 0) {
-      dismissSplash();
-      setView("view-registration");
-      return;
-    }
-
-    if (member.membershipStatus === "active") {
-      window.location.replace("./User/member.html");
-    } else {
-      dismissSplash();
-      setView("view-status-submitted");
-    }
-  } catch (err) {
-    dismissSplash();
-    showLoginError("Verification error: " + err.message);
-  }
-}
-
   </script>
 </body>
 </html>
