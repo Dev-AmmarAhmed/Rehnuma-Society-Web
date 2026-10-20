@@ -1,6 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <style>
+  /* 3D Splash Container */
+  #splash-screen {
+    perspective: 1000px;
+    background: radial-gradient(circle at center, #064e3b 0%, #022c22 45%, #020617 100%);
+  }
+
+  /* 3D Emblem Transformation */
+  .logo-3d-wrapper {
+    transform-style: preserve-3d;
+    animation: popIn3D 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes popIn3D {
+    0% {
+      opacity: 0;
+      transform: scale(0.6) rotateX(25deg) translateY(40px);
+      filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0));
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotateX(0deg) translateY(0);
+      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 25px rgba(20, 184, 166, 0.35));
+    }
+  }
+
+  /* Metallic Golden Ring Sheen */
+  .gold-sheen-ring {
+    background: conic-gradient(from 180deg at 50% 50%, #d4af37 0deg, #fff2a1 90deg, #aa7c11 180deg, #fff2a1 270deg, #d4af37 360deg);
+    padding: 3px;
+    border-radius: 9999px;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6), 0 10px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Wipe Right In Animation for Subtitle */
+  .wipe-right-in {
+    clip-path: inset(0 100% 0 0);
+    animation: wipeRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes wipeRight {
+    0% {
+      clip-path: inset(0 100% 0 0);
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    100% {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  </style>
+  
   
 <link rel="icon" type="image/png" href="./icon.png" />
 <link rel="apple-touch-icon" href="./icon.png" />
@@ -477,6 +532,98 @@
         showToast("Submission error: " + err.message, true);
       }
     });
+
+    // --- SPLASH ENGINE & TEXT TYPER ---
+const splashScreen = document.getElementById("splash-screen");
+const splashTitle = document.getElementById("splash-title");
+const splashSubtitle = document.getElementById("splash-subtitle");
+
+const targetText = "REHNUMA SOCIETY";
+let charIndex = 0;
+
+function startSplashSequence() {
+  // 1. Logo ke aane ke baad 300ms baad typewriter start
+  setTimeout(() => {
+    const typeInterval = setInterval(() => {
+      if (charIndex < targetText.length) {
+        splashTitle.textContent += targetText.charAt(charIndex);
+        charIndex++;
+      } else {
+        clearInterval(typeInterval);
+        // 2. Title khatam hote hi "INTEREST-FREE" wipe-in hoga
+        splashSubtitle.classList.remove("hidden");
+      }
+    }, 60); // Speed of each letter
+  }, 400);
+}
+
+// Sequence start
+startSplashSequence();
+
+// --- CLEAN SEAMLESS DISMISS ---
+function dismissSplash() {
+  splashScreen.classList.add("opacity-0", "pointer-events-none");
+  setTimeout(() => {
+    splashScreen.style.display = "none";
+  }, 500);
+}
+
+// Firebase Auth Router me modify karein:
+async function evaluateRouting(user) {
+  if (!user) {
+    // Agar logged in nahi hai, to 1.8s animation poora dikhakar login view par laayein
+    setTimeout(() => {
+      dismissSplash();
+      setView("view-login");
+    }, 1800);
+    return;
+  }
+
+  try {
+    const adminDoc = await getDoc(doc(db, "admins", user.uid));
+    if (adminDoc.exists()) {
+      await bindUserSession(user);
+      // Agar admin hai, to bina login page dikhaye foran switch karein
+      window.location.replace("./User/admin.html");
+      return;
+    }
+
+    const memberDoc = await getDoc(doc(db, "users", user.uid));
+    if (!memberDoc.exists()) {
+      await signOut(auth);
+      dismissSplash();
+      showLoginError("Access Denied: Account not registered.");
+      setView("view-login");
+      return;
+    }
+
+    const member = memberDoc.data();
+    if (member.membershipStatus === "denied") {
+      dismissSplash();
+      setView("view-status-denied");
+      return;
+    }
+
+    await bindUserSession(user);
+
+    if (member.loginCount === 0) {
+      dismissSplash();
+      setView("view-registration");
+      return;
+    }
+
+    if (member.membershipStatus === "active") {
+      window.location.replace("./User/member.html");
+    } else {
+      dismissSplash();
+      setView("view-status-submitted");
+    }
+  } catch (err) {
+    dismissSplash();
+    showLoginError("Verification error: " + err.message);
+  }
+}
+
   </script>
 </body>
 </html>
